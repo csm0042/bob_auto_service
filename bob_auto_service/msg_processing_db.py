@@ -4,20 +4,20 @@
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import datetime
+import os
+import sys
 if __name__ == "__main__":
-    import os
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.device import search_device_list
-from rpihome_v3.messages.heartbeat import HeartbeatMessage
-from rpihome_v3.messages.heartbeat_ack import HeartbeatMessageACK
-from rpihome_v3.messages.log_status_update import LogStatusUpdateMessage
-from rpihome_v3.messages.log_status_update_ack import LogStatusUpdateMessageACK
-from rpihome_v3.messages.return_command import ReturnCommandMessage
-from rpihome_v3.messages.return_command_ack import ReturnCommandMessageACK
-from rpihome_v3.messages.set_device_state import SetDeviceStateMessage
-from rpihome_v3.messages.update_command import UpdateCommandMessage
-from rpihome_v3.messages.update_command_ack import UpdateCommandMessageACK
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.tools.device import search_device_list
+from bob_auto_service.messages.heartbeat import HeartbeatMessage
+from bob_auto_service.messages.heartbeat_ack import HeartbeatMessageACK
+from bob_auto_service.messages.log_status_update import LogStatusUpdateMessage
+from bob_auto_service.messages.log_status_update_ack import LogStatusUpdateMessageACK
+from bob_auto_service.messages.return_command import ReturnCommandMessage
+from bob_auto_service.messages.return_command_ack import ReturnCommandMessageACK
+from bob_auto_service.messages.set_device_state import SetDeviceStateMessage
+from bob_auto_service.messages.update_command import UpdateCommandMessage
+from bob_auto_service.messages.update_command_ack import UpdateCommandMessageACK
 
 
 # Authorship Info *************************************************************

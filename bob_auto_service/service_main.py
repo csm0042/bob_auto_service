@@ -6,28 +6,28 @@
 import asyncio
 import datetime
 import logging
+import os
+import sys
 if __name__ == "__main__":
-    import os
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.automation_service.msg_processing import create_heartbeat_msg
-from rpihome_v3.automation_service.msg_processing import process_heartbeat_msg
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.msg_processing import create_heartbeat_msg
+from bob_auto_service.msg_processing import process_heartbeat_msg
 
-from rpihome_v3.automation_service.msg_processing_db import process_log_status_update_msg
-from rpihome_v3.automation_service.msg_processing_db import process_log_status_update_msg_ack
-from rpihome_v3.automation_service.msg_processing_db import process_return_command_msg
-from rpihome_v3.automation_service.msg_processing_db import process_return_command_msg_ack
-from rpihome_v3.automation_service.msg_processing_db import process_update_command_msg
-from rpihome_v3.automation_service.msg_processing_db import process_update_command_msg_ack
+from bob_auto_service.msg_processing_db import process_log_status_update_msg
+from bob_auto_service.msg_processing_db import process_log_status_update_msg_ack
+from bob_auto_service.msg_processing_db import process_return_command_msg
+from bob_auto_service.msg_processing_db import process_return_command_msg_ack
+from bob_auto_service.msg_processing_db import process_update_command_msg
+from bob_auto_service.msg_processing_db import process_update_command_msg_ack
 
-from rpihome_v3.automation_service.msg_processing_wemo import process_get_device_state_msg
-from rpihome_v3.automation_service.msg_processing_wemo import process_get_device_state_msg_ack
-from rpihome_v3.automation_service.msg_processing_wemo import process_set_device_state_msg
-from rpihome_v3.automation_service.msg_processing_wemo import process_set_device_state_msg_ack
+from bob_auto_service.msg_processing_wemo import process_get_device_state_msg
+from bob_auto_service.msg_processing_wemo import process_get_device_state_msg_ack
+from bob_auto_service.msg_processing_wemo import process_set_device_state_msg
+from bob_auto_service.msg_processing_wemo import process_set_device_state_msg_ack
 
-from rpihome_v3.automation_service.msg_processing_schedule import create_get_device_scheduled_state_msg
-from rpihome_v3.automation_service.msg_processing_schedule import process_get_device_scheduled_state_msg
-from rpihome_v3.automation_service.msg_processing_schedule import process_get_device_scheduled_state_msg_ack
+from bob_auto_service.msg_processing_schedule import create_get_device_scheduled_state_msg
+from bob_auto_service.msg_processing_schedule import process_get_device_scheduled_state_msg
+from bob_auto_service.msg_processing_schedule import process_get_device_scheduled_state_msg_ack
 
 
 # Authorship Info *************************************************************

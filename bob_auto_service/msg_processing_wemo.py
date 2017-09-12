@@ -4,15 +4,15 @@
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import copy
+import os
+import sys
 if __name__ == "__main__":
-    import os
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.device import search_device_list
-from rpihome_v3.messages.get_device_state import GetDeviceStateMessage
-from rpihome_v3.messages.get_device_state_ack import GetDeviceStateMessageACK
-from rpihome_v3.messages.set_device_state import SetDeviceStateMessage
-from rpihome_v3.messages.set_device_state_ack import SetDeviceStateMessageACK
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.tools.device import search_device_list
+from bob_auto_service.messages.get_device_state import GetDeviceStateMessage
+from bob_auto_service.messages.get_device_state_ack import GetDeviceStateMessageACK
+from bob_auto_service.messages.set_device_state import SetDeviceStateMessage
+from bob_auto_service.messages.set_device_state_ack import SetDeviceStateMessageACK
 
 
 # Authorship Info *************************************************************

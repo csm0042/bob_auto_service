@@ -3,12 +3,12 @@
 """
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
+import os
+import sys
 if __name__ == "__main__":
-    import os
-    import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.messages.heartbeat import HeartbeatMessage
-from rpihome_v3.messages.heartbeat_ack import HeartbeatMessageACK
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.messages.heartbeat import HeartbeatMessage
+from bob_auto_service.messages.heartbeat_ack import HeartbeatMessageACK
 
 
 # Authorship Info *************************************************************
