@@ -6,13 +6,13 @@
 import copy
 import datetime
 import logging
+import os
 import sys
 import unittest
 if __name__ == "__main__":
-    import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.field_checkers import in_int_range
-from rpihome_v3.helpers.field_checkers import is_valid_datetime
+from bob_auto_service.tools.field_checkers import in_int_range
+from bob_auto_service.tools.field_checkers import is_valid_datetime
 
 
 # Define test class ***********************************************************

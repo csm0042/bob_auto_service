@@ -7,12 +7,12 @@ import asyncio
 import copy
 import datetime
 import logging
+import os
 import sys
 import unittest
 if __name__ == "__main__":
-    import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.message_handlers import MessageHandler
+from bob_auto_service.tools.message_handlers import MessageHandler
 
 
 # Define test class ***********************************************************

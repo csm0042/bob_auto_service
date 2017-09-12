@@ -5,12 +5,12 @@
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import datetime
 import logging
+import os
 import sys
 import unittest
 if __name__ == "__main__":
-    import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.sun import Sun
+from bob_auto_service.tools.sun import Sun
 
 
 # Authorship Info *************************************************************

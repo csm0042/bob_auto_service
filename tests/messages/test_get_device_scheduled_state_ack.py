@@ -6,12 +6,12 @@
 import copy
 import datetime
 import logging
+import os
 import sys
 import unittest
 if __name__ == "__main__":
-    import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.messages.get_device_scheduled_state_ack import GetDeviceScheduledStateMessageACK
+from bob_auto_service.messages.get_device_scheduled_state_ack import GetDeviceScheduledStateMessageACK
 
 
 # Define test class ***********************************************************

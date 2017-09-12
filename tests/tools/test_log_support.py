@@ -4,12 +4,12 @@
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import logging
+import os
 import sys
 import unittest
 if __name__ == "__main__":
-    import os
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.log_support import setup_log_handlers
+from bob_auto_service.tools.log_support import setup_log_handlers
 
 
 # Define test class ***********************************************************

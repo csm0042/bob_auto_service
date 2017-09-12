@@ -11,15 +11,15 @@ import os
 import sys
 import unittest
 if __name__ == "__main__":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from rpihome_v3.helpers.ref_num import RefNum
-from rpihome_v3.automation_service.configure import ConfigureService
-from rpihome_v3.automation_service.msg_processing_db import process_log_status_update_msg
-from rpihome_v3.automation_service.msg_processing_db import process_log_status_update_msg_ack
-from rpihome_v3.automation_service.msg_processing_db import process_return_command_msg
-from rpihome_v3.automation_service.msg_processing_db import process_return_command_msg_ack
-from rpihome_v3.automation_service.msg_processing_db import process_update_command_msg
-from rpihome_v3.automation_service.msg_processing_db import process_update_command_msg_ack
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.tools.ref_num import RefNum
+from bob_auto_service.configure import ConfigureService
+from bob_auto_service.msg_processing_db import process_log_status_update_msg
+from bob_auto_service.msg_processing_db import process_log_status_update_msg_ack
+from bob_auto_service.msg_processing_db import process_return_command_msg
+from bob_auto_service.msg_processing_db import process_return_command_msg_ack
+from bob_auto_service.msg_processing_db import process_update_command_msg
+from bob_auto_service.msg_processing_db import process_update_command_msg_ack
 
 
 # Define test class ***********************************************************
@@ -38,8 +38,9 @@ class Test_message_processing_db(unittest.TestCase):
         self.ref_num_initial = int()
         self.temp_dt = datetime.datetime
         # Create items that will come from config file
-        self.parent_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        self.parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.config_file = os.path.join(self.parent_path, 'config.ini')
+        print("\n\n" + self.config_file + "\n\n")
         self.config = ConfigureService(self.config_file)
         self.service_addresses = self.config.get_servers()
         self.message_types = self.config.get_message_types()
