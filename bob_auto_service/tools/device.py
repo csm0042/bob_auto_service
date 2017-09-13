@@ -47,16 +47,19 @@ class Device(object):
     def __init__(self, log=None, **kwargs):
         # Configure logger
         self.log = log or logging.getLogger(__name__)
-        
+
         # Create class instance objects
         self._dev_name = str()
         self._dev_type = str()
         self._dev_addr = str()
-        self._dev_cmd = str()        
+        self._dev_cmd = str()
         self._dev_status = str()
+        self._dev_status_mem = str()
         self._dev_last_seen = datetime.datetime
+        self._dev_last_seen_mem = datetime.datetime
         self._dev_rule = str()
         
+
         # Process input variables if present
         if kwargs is not None:
             for key, value in kwargs.items():
@@ -80,10 +83,18 @@ class Device(object):
                     self.dev_status = value
                     self.log.debug('Device status set during __init__ '
                                    'to: %s', self.dev_status)
+                if key == "dev_status_mem":
+                    self.dev_status_mem = value
+                    self.log.debug('Device status mem set during __init__ '
+                                   'to: %s', self.dev_status_mem)                                   
                 if key == "dev_last_seen":
                     self.dev_last_seen = value
                     self.log.debug('Device last seen set during __init__ '
                                    'to: %s', self.dev_last_seen)
+                if key == "dev_last_seen_mem":
+                    self.dev_last_seen_mem = value
+                    self.log.debug('Device last seen mem set during __init__ '
+                                   'to: %s', self.dev_last_seen_mem)                                   
                 if key == "dev_rule":
                     self.dev_rule = value
                     self.log.debug('Device rule set during __init__ '
@@ -166,10 +177,25 @@ class Device(object):
             self._dev_status = (str(value)).lower()
         self.log.debug('Device status updated to: %s', self._dev_status)
 
+    # device status memory field **********************************************
+    @property
+    def dev_status_mem(self):
+        self.log.debug('Returning current device status mem: %s', self._dev_status_mem)
+        return self._dev_status_mem
+
+    @dev_status_mem.setter
+    def dev_status_mem(self, value):
+        if isinstance(value, str):
+            self._dev_status_mem = value.lower()
+        else:
+            self._dev_status_mem = (str(value)).lower()
+        self.log.debug('Device status mem updated to: %s', self._dev_status_mem)        
+
     # device last seen field **************************************************
     @property
     def dev_last_seen(self):
-        self.log.debug('Returning current device last seen: %s', self._dev_last_seen)
+        self.log.debug('Returning current device last seen: %s',
+                       self._dev_last_seen)
         return self._dev_last_seen
 
     @dev_last_seen.setter
@@ -190,6 +216,33 @@ class Device(object):
             else:
                 self._dev_last_seen = value
         self.log.debug('Device last seen updated to: %s', self._dev_last_seen)
+
+    # device last seen field **************************************************
+    @property
+    def dev_last_seen_mem(self):
+        self.log.debug('Returning current device last seen mem: %s',
+                       self._dev_last_seen_mem)
+        return self._dev_last_seen_mem
+
+    @dev_last_seen_mem.setter
+    def dev_last_seen_mem(self, value):
+        if isinstance(value, datetime.datetime):
+            self._dev_last_seen_mem = (str(value))[:19]
+        elif isinstance(value, datetime.time):
+            self._dev_last_seen_mem = (str(
+                datetime.datetime.combine(
+                    datetime.datetime.now().date(), value)))[:19]
+        elif isinstance(value, datetime.date):
+            self._dev_last_seen_mem = (str(
+                datetime.datetime.combine(
+                    value, datetime.datetime.now().time())))[:19]
+        if isinstance(value, str):
+            if len(value) >= 19:
+                self._dev_last_seen_mem = value[:19]
+            else:
+                self._dev_last_seen_mem = value
+        self.log.debug('Device last seen mem updated to: %s',
+                       self._dev_last_seen_mem)
 
     # device rule field *******************************************************
     @property

@@ -4,12 +4,15 @@
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import asyncio
+import copy
 import datetime
 import logging
 import os
 import sys
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.messages.log_status_update import LogStatusUpdateMessage
+
 from bob_auto_service.msg_processing import create_heartbeat_msg
 from bob_auto_service.msg_processing import process_heartbeat_msg
 
@@ -62,6 +65,9 @@ class MainTask(object):
         self.msg_source_addr = str()
         self.msg_type = str()
         self.destinations = []
+        self.timestamp_db = datetime.datetime.now() + datetime.timedelta(seconds=-120)
+        self.timestamp_schedule = datetime.datetime.now() + datetime.timedelta(seconds=-120)
+        self.timestamp_wemo = datetime.datetime.now() + datetime.timedelta(seconds=-120)
         # Map input variables
         if kwargs is not None:
             for key, value in kwargs.items():
@@ -126,6 +132,12 @@ class MainTask(object):
                 # Process messages from database service
                 if self.msg_source_addr == self.service_addresses['database_addr']:
 
+                    # update last-seen timestamp from database service
+                    if self.msg_type == self.message_types['heartbeat']:
+                        self.log.debug('Updating heartbeat timestamp'
+                                       'from database service')
+                        self.timestamp_db = datetime.datetime.now()
+
                     # Process log status update message
                     if self.msg_type == self.message_types['log_status_update']:
                         self.log.debug('Message is a Log Status Update message')
@@ -178,6 +190,12 @@ class MainTask(object):
                 # Process messages from wemo service
                 if self.msg_source_addr == self.service_addresses['wemo_addr']:
 
+                    # update last-seen timestamp from wemo service
+                    if self.msg_type == self.message_types['heartbeat']:
+                        self.log.debug('Updating heartbeat timestamp '
+                                       'from wemo service')
+                        self.timestamp_wemo = datetime.datetime.now()
+
                     # Process get device state message
                     if self.msg_type == self.message_types['get_device_state']:
                         self.log.debug('Message is a Get Device Status (GDS) message')
@@ -213,6 +231,12 @@ class MainTask(object):
                 # Process messages from calendar/schedule service
                 if self.msg_source_addr == self.service_addresses['schedule_addr']:
 
+                    # update last-seen timestamp from database service
+                    if self.msg_type == self.message_types['heartbeat']:
+                        self.log.debug('Updating heartbeat timestamp '
+                                       'from schedule service')
+                        self.timestamp_schedule = datetime.datetime.now()
+
                     # Process get device scheduled state message
                     if self.msg_type == self.message_types['get_device_scheduled_state']:
                         self.log.debug('Message is a get device scheduled state message')
@@ -242,14 +266,20 @@ class MainTask(object):
 
             # PERIODIC TASKS
             # Periodically send heartbeats to other services
-            if datetime.datetime.now() >= (self.last_check_hb + datetime.timedelta(seconds=120)):
+            if datetime.datetime.now() >= (self.last_check_hb + datetime.timedelta(seconds=60)):
                 self.destinations = [
-                    (self.service_addresses['database_addr'], self.service_addresses['database_port']),
-                    (self.service_addresses['motion_addr'], self.service_addresses['motion_port']),
-                    (self.service_addresses['nest_addr'], self.service_addresses['nest_port']),
-                    (self.service_addresses['occupancy_addr'], self.service_addresses['occupancy_port']),
-                    (self.service_addresses['schedule_addr'], self.service_addresses['schedule_port']),
-                    (self.service_addresses['wemo_addr'], self.service_addresses['wemo_port'])
+                    (self.service_addresses['database_addr'],
+                     self.service_addresses['database_port']),
+                    (self.service_addresses['motion_addr'],
+                     self.service_addresses['motion_port']),
+                    (self.service_addresses['nest_addr'],
+                     self.service_addresses['nest_port']),
+                    (self.service_addresses['occupancy_addr'],
+                     self.service_addresses['occupancy_port']),
+                    (self.service_addresses['schedule_addr'],
+                     self.service_addresses['schedule_port']),
+                    (self.service_addresses['wemo_addr'],
+                     self.service_addresses['wemo_port'])
                 ]
                 self.out_msg_list = create_heartbeat_msg(
                     self.log,
@@ -272,7 +302,8 @@ class MainTask(object):
 
             # PERIODIC TASKS
             # Periodically check scheduled on/off commands for devices
-            if datetime.datetime.now() >= (self.last_check_schedule + datetime.timedelta(minutes=1)):
+            if datetime.datetime.now() \
+                >= (self.last_check_schedule + datetime.timedelta(minutes=1)):
                 self.out_msg_list = create_get_device_scheduled_state_msg(
                     self.log,
                     self.ref_num,
@@ -290,6 +321,54 @@ class MainTask(object):
                 # Update last-check
                 self.last_check_schedule = datetime.datetime.now()
 
+
+            # DEVICE STATUS CHANGE OF STATE CHECKS
+            # Log any device changes of state to database.  Only log if database
+            # service is confirmed alive to avoid data loss (hb received
+            # within 120 seconds)
+            if datetime.datetime.now() < self.timestamp_db \
+                + datetime.timedelta(seconds=120):
+                # Initialize outgoing message list
+                self.out_msg_list = []
+                # Cycle through devices in list looking for changes of state
+                for i, d in enumerate(self.devices):
+                    # COS detected by comparing stats and last_seen to their memory
+                    # values
+                    if d.dev_status != d.dev_status_mem or d.dev_last_seen != d.dev_last_seen_mem:
+                        # When COS detected, append new LSU message to outgoing list
+                        self.log.debug('Change of state detected in the status '
+                                       'of: %s', d.dev_name)
+                        self.out_msg_list.append(
+                            copy.copy(
+                                LogStatusUpdateMessage(
+                                    log=self.log,
+                                    ref=self.ref_num.new(),
+                                    dest_addr=self.service_addresses['database_addr'],
+                                    dest_port=self.service_addresses['database_port'],
+                                    source_addr=self.service_addresses['automation_addr'],
+                                    source_port=self.service_addresses['automation_port'],
+                                    msg_type=self.message_types['log_status_update'],
+                                    dev_name=d.dev_name,
+                                    dev_addr=d.dev_addr,
+                                    dev_status=d.dev_status,
+                                    dev_last_seen=d.dev_last_seen
+                                ).complete
+                            )
+                        )
+                        # Update values in status_mem and last_seen_mem to prevent
+                        # duplicate triggers
+                        self.log.debug('LSU message for %s created and '
+                                       'queued', d.dev_name)
+                        self.devices[i].dev_status_mem = copy.copy(d.dev_status)
+                        self.devices[i].dev_last_seen_mem = copy.copy(d.dev_last_seen)
+
+                # Que up response messages in outgoing msg que
+                if len(self.out_msg_list) > 0:
+                    self.log.debug('Queueing message(s)')
+                    for self.out_msg in self.out_msg_list:
+                        self.msg_out_queue.put_nowait(self.out_msg)
+                        self.log.debug('Message [%s] successfully queued',
+                                       self.out_msg)
 
 
 
