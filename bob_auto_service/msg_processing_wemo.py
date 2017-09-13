@@ -49,7 +49,7 @@ def process_get_device_state_msg(log, msg, service_addresses):
 
     # Load message into output list
     log.debug('Loading completed msg: [%s]', message.complete)
-    out_msg_list.append(message.complete)
+    out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
     return out_msg_list

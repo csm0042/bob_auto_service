@@ -3,6 +3,7 @@
 """
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
+import copy
 import datetime
 import os
 import sys
@@ -50,7 +51,7 @@ def process_log_status_update_msg(log, msg, service_addresses):
 
     # Load revised message into output list
     log.debug('Loading completed msg: %s', message.complete)
-    out_msg_list.append(message.complete)
+    out_msg_list.append(copy.copy(message.complete))
 
     # Return response messages
     return out_msg_list
@@ -94,7 +95,7 @@ def process_return_command_msg(log, msg, service_addresses):
     
     # Load message into output list
     log.debug('Loading completed msg: %s', message.complete)
-    out_msg_list.append(message.complete)
+    out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
     return out_msg_list
@@ -134,7 +135,7 @@ def process_return_command_msg_ack(log, ref_num, devices, msg, service_addresses
 
     # Load message into output list
     log.debug('Loading completed msg: %s', out_msg.complete)
-    out_msg_list.append(out_msg.complete)
+    out_msg_list.append(copy.copy(out_msg.complete))
 
     # Create message to wemo service to issue command to device
     if dev_pointer is not None:
@@ -156,7 +157,7 @@ def process_return_command_msg_ack(log, ref_num, devices, msg, service_addresses
                 dev_last_seen=devices[dev_pointer].dev_last_seen)
             # Load message into output list
             log.debug('Loading completed msg: %s', out_msg.complete)
-            out_msg_list.append(out_msg.complete)
+            out_msg_list.append(copy.copy(out_msg.complete))
     else:
         log.debug('Device name not found in known device table')
 
@@ -183,7 +184,7 @@ def process_update_command_msg(log, msg, service_addresses):
 
     # Load message into output list
     log.debug('Loading completed msg: %s', message.complete)
-    out_msg_list.append(message.complete)
+    out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
     return out_msg_list

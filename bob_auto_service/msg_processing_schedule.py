@@ -50,7 +50,7 @@ def create_get_device_scheduled_state_msg(log, ref_num, devices, service_address
 
             # Load message into output list
             log.debug('Loading completed msg: [%s]', out_msg.complete)
-            out_msg_list.append(out_msg.complete)
+            out_msg_list.append(copy.copy(out_msg.complete))
 
     # Return response message
     return out_msg_list
@@ -76,7 +76,7 @@ def process_get_device_scheduled_state_msg(log, msg, service_addresses):
 
     # Load message into output list
     log.debug('Loading completed msg: [%s]', message.complete)
-    out_msg_list.append(message.complete)
+    out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
     return out_msg_list
@@ -132,7 +132,7 @@ def process_get_device_scheduled_state_msg_ack(log, ref_num, devices, msg, servi
 
                 # Load message into output list
                 log.debug('Loading completed msg: [%s]', out_msg.complete)
-                out_msg_list.append(out_msg.complete)
+                out_msg_list.append(copy.copy(out_msg.complete))
     else:
         log.debug('Device not in device list: %s', message.dev_name)
 
