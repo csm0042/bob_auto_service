@@ -63,6 +63,7 @@ class MainTask(object):
         self.next_msg = str()
         self.next_msg_split = []
         self.msg_source_addr = str()
+        self.msg_source_port = str()
         self.msg_type = str()
         self.destinations = []
         self.timestamp_db = datetime.datetime.now() + datetime.timedelta(seconds=-120)
@@ -115,22 +116,18 @@ class MainTask(object):
                 self.next_msg_split = self.next_msg.split(',')
                 if len(self.next_msg_split) >= 6:
                     self.log.debug('Extracting source address and message type')
-                    self.msg_source_addr = self.next_msg_split[1]
+                    self.msg_source_addr = self.next_msg_split[3]
+                    self.msg_source_port = self.next_msg_split[4]
                     self.msg_type = self.next_msg_split[5]
                     self.log.debug('Source Address: %s', self.msg_source_addr)
+                    self.log.debug('Source Port: %s', self.msg_source_addr)
                     self.log.debug('Message Type: %s', self.msg_type)
 
-                # Process heartbeat from remote service
-                if self.msg_type == self.message_types['heartbeat']:
-                    self.log.debug('Message is a heartbeat')
-                    self.out_msg_list = process_heartbeat_msg(
-                        self.log,
-                        self.ref_num,
-                        self.next_msg,
-                        self.message_types)
 
                 # Process messages from database service
-                if self.msg_source_addr == self.service_addresses['database_addr']:
+                if self.msg_source_addr == self.service_addresses['database_addr'] \
+                    and self.msg_source_port == self.service_addresses['database_port']:
+
 
                     # update last-seen timestamp from database service
                     if self.msg_type == self.message_types['heartbeat']:
@@ -187,8 +184,16 @@ class MainTask(object):
                             self.log,
                             self.next_msg)
 
+                    # Que up response messages in outgoing msg que
+                    if len(self.out_msg_list) > 0:
+                        self.log.debug('Queueing response message(s)')
+                        for self.out_msg in self.out_msg_list:
+                            self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
+                            self.log.debug('Message [%s] successfully queued', self.out_msg)                            
+
                 # Process messages from wemo service
-                if self.msg_source_addr == self.service_addresses['wemo_addr']:
+                if self.msg_source_addr == self.service_addresses['wemo_addr'] \
+                    and self.msg_source_port == self.service_addresses['wemo_port']:
 
                     # update last-seen timestamp from wemo service
                     if self.msg_type == self.message_types['heartbeat']:
@@ -228,8 +233,16 @@ class MainTask(object):
                             self.devices,
                             self.next_msg)
 
+                    # Que up response messages in outgoing msg que
+                    if len(self.out_msg_list) > 0:
+                        self.log.debug('Queueing response message(s)')
+                        for self.out_msg in self.out_msg_list:
+                            self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
+                            self.log.debug('Message [%s] successfully queued', self.out_msg)                            
+
                 # Process messages from calendar/schedule service
-                if self.msg_source_addr == self.service_addresses['schedule_addr']:
+                if self.msg_source_addr == self.service_addresses['schedule_addr'] \
+                    and self.msg_source_port == self.service_addresses['schedule_port']:
 
                     # update last-seen timestamp from database service
                     if self.msg_type == self.message_types['heartbeat']:
@@ -256,12 +269,12 @@ class MainTask(object):
                             self.service_addresses,
                             self.message_types)
 
-                # Que up response messages in outgoing msg que
-                if len(self.out_msg_list) > 0:
-                    self.log.debug('Queueing response message(s)')
-                    for self.out_msg in self.out_msg_list:
-                        self.msg_out_queue.put_nowait(self.out_msg)
-                        self.log.debug('Message [%s] successfully queued', self.out_msg)
+                    # Que up response messages in outgoing msg que
+                    if len(self.out_msg_list) > 0:
+                        self.log.debug('Queueing response message(s)')
+                        for self.out_msg in self.out_msg_list:
+                            self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
+                            self.log.debug('Message [%s] successfully queued', self.out_msg)
 
 
             # PERIODIC TASKS
@@ -293,7 +306,7 @@ class MainTask(object):
                 if len(self.out_msg_list) > 0:
                     self.log.debug('Queueing message(s)')
                     for self.out_msg in self.out_msg_list:
-                        self.msg_out_queue.put_nowait(self.out_msg)
+                        self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
                         self.log.debug('Message [%s] successfully queued', self.out_msg)
 
                 # Update last-check
@@ -315,7 +328,7 @@ class MainTask(object):
                 if len(self.out_msg_list) > 0:
                     self.log.debug('Queueing message(s)')
                     for self.out_msg in self.out_msg_list:
-                        self.msg_out_queue.put_nowait(self.out_msg)
+                        self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
                         self.log.debug('Message [%s] successfully queued', self.out_msg)
 
                 # Update last-check
@@ -366,7 +379,7 @@ class MainTask(object):
                 if len(self.out_msg_list) > 0:
                     self.log.debug('Queueing message(s)')
                     for self.out_msg in self.out_msg_list:
-                        self.msg_out_queue.put_nowait(self.out_msg)
+                        self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
                         self.log.debug('Message [%s] successfully queued',
                                        self.out_msg)
 
