@@ -47,9 +47,8 @@ __status__ = "Development"
 
 # Internal Service Work Task **************************************************
 class MainTask(object):
-    def __init__(self, log, log_path, **kwargs):
+    def __init__(self, log_path, **kwargs):
         # Configure logger
-        self.log = log
         self.log_path = log_path
         self.log_init = setup_function_logger(self.log_path, 'Class_MainTask_Init')
         self.log_run = setup_function_logger(self.log_path, 'Method_MainTask_Run')
@@ -393,4 +392,4 @@ class MainTask(object):
 
 
             # Yield to other tasks for a while
-            yield from asyncio.sleep(0.25)
+            yield from asyncio.sleep(self.sleep_time)
