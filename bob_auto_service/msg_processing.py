@@ -26,7 +26,7 @@ __status__ = "Development"
 def create_heartbeat_msg(log_path, ref_num, destinations, source_addr, source_port, message_types):
     """ function to create one or more heartbeat messages """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'create_heartbeat_msg')
+    log = setup_function_logger(log_path, 'Function_create_heartbeat_msg')
 
     # Initialize result list
     log.debug('Clearing outgoing message list')
@@ -57,7 +57,7 @@ def create_heartbeat_msg(log_path, ref_num, destinations, source_addr, source_po
 def process_heartbeat_msg(log_path, ref_num, msg, message_types):
     """ function to ack wake-up requests to wemo service """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'process_heartbeat_msg')
+    log = setup_function_logger(log_path, 'Function_process_heartbeat_msg')
 
     # Initialize result list
     out_msg_list = []

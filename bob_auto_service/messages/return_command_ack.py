@@ -249,7 +249,7 @@ class ReturnCommandMessageACK(object):
     @dev_timestamp.setter
     def dev_timestamp(self, value):
         self._dev_timestamp = is_valid_datetime(
-            self.log,
+            self.log_path,
             value,
             self._dev_timestamp)
         self.log.debug('Device timestamp updated to: %s', self._dev_timestamp)
@@ -264,7 +264,7 @@ class ReturnCommandMessageACK(object):
     @dev_processed.setter
     def dev_processed(self, value):
         self._dev_processed = is_valid_datetime(
-            self.log,
+            self.log_path,
             value,
             self._dev_processed)
         self.log.debug('Device processed updated to: %s', self._dev_processed)                      
