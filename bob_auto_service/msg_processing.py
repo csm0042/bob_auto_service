@@ -9,6 +9,7 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bob_auto_service.messages.heartbeat import HeartbeatMessage
 from bob_auto_service.messages.heartbeat_ack import HeartbeatMessageACK
+from bob_auto_service.tools.log_support import setup_function_logger
 
 
 # Authorship Info *************************************************************
@@ -22,15 +23,21 @@ __email__ = "csmaue@gmail.com"
 __status__ = "Development"
 
 
-def create_heartbeat_msg(log, ref_num, destinations, source_addr, source_port, message_types):
+def create_heartbeat_msg(log_path, ref_num, destinations, source_addr, source_port, message_types):
     """ function to create one or more heartbeat messages """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'create_heartbeat_msg')
+
     # Initialize result list
+    log.debug('Clearing outgoing message list')
     out_msg_list = []
 
     # Generate a heartbeat message for each destination given
     for entry in destinations:
+        log.debug('Creating heartbeat to send to: %s:%s',
+                  entry[0], entry[1])
         out_msg = HeartbeatMessage(
-            log=log,
+            log_path,
             ref=ref_num.new(),
             dest_addr=entry[0],
             dest_port=entry[1],
@@ -43,22 +50,26 @@ def create_heartbeat_msg(log, ref_num, destinations, source_addr, source_port, m
         out_msg_list.append(out_msg.complete)
 
     # Return response message
+    log.debug('Returning generated messages: %s', out_msg_list)
     return out_msg_list
 
 
-def process_heartbeat_msg(log, ref_num, msg, message_types):
+def process_heartbeat_msg(log_path, ref_num, msg, message_types):
     """ function to ack wake-up requests to wemo service """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'process_heartbeat_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into wemo wake-up message class
-    message = HeartbeatMessage(log=log)
+    message = HeartbeatMessage(log_path)
     message.complete = msg
 
     # Send response indicating query was executed
     log.debug('Building response message header')
     out_msg = HeartbeatMessageACK(
-        log=log,
+        log_path,
         ref=ref_num.new(),
         dest_addr=message.source_addr,
         dest_port=message.source_port,

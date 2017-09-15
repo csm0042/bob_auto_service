@@ -9,6 +9,7 @@ import os
 import sys
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.tools.log_support import setup_function_logger
 from bob_auto_service.tools.device import search_device_list
 from bob_auto_service.messages.heartbeat import HeartbeatMessage
 from bob_auto_service.messages.heartbeat_ack import HeartbeatMessageACK
@@ -33,15 +34,18 @@ __status__ = "Development"
 
 
 # Process log status update messages ******************************************
-def process_log_status_update_msg(log, msg, service_addresses):
+def process_log_status_update_msg(log_path, msg, service_addresses):
     """ If a mis-directed LSU message is received, this function will
         re-direct the message to the database service
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_log_status_update_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = LogStatusUpdateMessage(log=log)
+    message = LogStatusUpdateMessage(log_path)
     message.complete = msg
 
     # Update destination address and port to forward to db service
@@ -58,15 +62,18 @@ def process_log_status_update_msg(log, msg, service_addresses):
 
 
 # Process log status update ACK messages **************************************
-def process_log_status_update_msg_ack(log, msg):
+def process_log_status_update_msg_ack(log_path, msg):
     """ When a LSU-ACK message is received, this function will
         log it then exit
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_log_status_update_ack_msg')
+    
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = LogStatusUpdateMessageACK(log=log)
+    message = LogStatusUpdateMessageACK(log_path)
     message.complete = msg
 
     # Log receipt of ACK for debug purposes
@@ -77,15 +84,18 @@ def process_log_status_update_msg_ack(log, msg):
 
 
 # Process return command messages *********************************************
-def process_return_command_msg(log, msg, service_addresses):
+def process_return_command_msg(log_path, msg, service_addresses):
     """ If a mis-directed RC message is received, this function will
         re-direct that message to database service
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_return_command_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = ReturnCommandMessage(log=log)
+    message = ReturnCommandMessage(log_path)
     message.complete = msg
 
     # Update destination address and port to forward to db service
@@ -102,17 +112,20 @@ def process_return_command_msg(log, msg, service_addresses):
 
 
 # Process return command ACK messages *****************************************
-def process_return_command_msg_ack(log, ref_num, devices, msg, service_addresses, message_types):
+def process_return_command_msg_ack(log_path, ref_num, devices, msg, service_addresses, message_types):
     """ When a RC-ACK message is received, this function will:
         1) Generate and queue a UC message to mark the command as processed
         2) Generate and queue a SDS message to the appropriate device gateway
            to forward to the field device for action
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_return_command_msg_ack')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = ReturnCommandMessageACK(log=log)
+    message = ReturnCommandMessageACK(log_path)
     message.complete = msg
 
     # Search device table to find device name
@@ -123,7 +136,7 @@ def process_return_command_msg_ack(log, ref_num, devices, msg, service_addresses
     # Send UC message to acknowledge received command and mark as processed
     log.debug('Generating UC message to mark device cmd as processed')
     out_msg = UpdateCommandMessage(
-        log=log,
+        log_path,
         ref=ref_num.new(),
         dest_addr=service_addresses['database_addr'],
         dest_port=service_addresses['database_port'],
@@ -143,7 +156,7 @@ def process_return_command_msg_ack(log, ref_num, devices, msg, service_addresses
         if devices[dev_pointer].dev_type == 'wemo_switch':
             # Determine what command to issue
             out_msg = SetDeviceStateMessage(
-                log=log,
+                log_path,
                 ref=ref_num.new(),
                 dest_addr=service_addresses['wemo_addr'],
                 dest_port=service_addresses['wemo_port'],
@@ -166,15 +179,18 @@ def process_return_command_msg_ack(log, ref_num, devices, msg, service_addresses
 
 
 # Process update command messages *********************************************
-def process_update_command_msg(log, msg, service_addresses):
+def process_update_command_msg(log_path, msg, service_addresses):
     """ If a mis-directed UC message is received, this function will
         re-direct that message to the database service
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_update_command_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = UpdateCommandMessage(log=log)
+    message = UpdateCommandMessage(log_path)
     message.complete = msg
 
     # Update destination address and port to forward to db service
@@ -192,15 +208,18 @@ def process_update_command_msg(log, msg, service_addresses):
 
 
 # Process update command ACK messages *****************************************
-def process_update_command_msg_ack(log, msg):
+def process_update_command_msg_ack(log_path, msg):
     """ When a UC-ACK message is received, this function will:
         log that message and then exit
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_update_command_msg_ack')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = UpdateCommandMessageACK()
+    message = UpdateCommandMessageACK(log_path)
     message.complete = msg
 
     # Log receipt of ACK for debug purposes

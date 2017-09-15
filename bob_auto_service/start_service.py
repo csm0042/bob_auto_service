@@ -33,6 +33,7 @@ config_file = os.path.join(parent_path, 'config.ini')
 print("\n\nUsing Config file:\n" + config_file + "\n\n")
 SERVICE_CONFIG = ConfigureService(config_file)
 LOG = SERVICE_CONFIG.get_logger()
+LOG_PATH = SERVICE_CONFIG.get_logger_path()
 SERVICE_ADDRESSES = SERVICE_CONFIG.get_servers()
 MESSAGE_TYPES = SERVICE_CONFIG.get_message_types()
 CUR_LAT, CUR_LONG = SERVICE_CONFIG.get_location()
@@ -43,6 +44,7 @@ LOOP = asyncio.get_event_loop()
 COMM_HANDLER = MessageHandler(LOG, LOOP)
 MAINTASK = MainTask(
     LOG,
+    LOG_PATH,
     ref=REF_NUM,
     devices=DEVICES,
     msg_in_queue=COMM_HANDLER.msg_in_queue,

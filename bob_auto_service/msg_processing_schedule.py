@@ -8,6 +8,7 @@ import os
 import sys
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.tools.log_support import setup_function_logger    
 from bob_auto_service.tools.device import search_device_list
 from bob_auto_service.messages.get_device_scheduled_state import GetDeviceScheduledStateMessage
 from bob_auto_service.messages.get_device_scheduled_state_ack import GetDeviceScheduledStateMessageACK
@@ -26,10 +27,13 @@ __status__ = "Development"
 
 
 # Create get device scheduled state message ***********************************
-def create_get_device_scheduled_state_msg(log, ref_num, devices, service_addresses, message_types):
+def create_get_device_scheduled_state_msg(log_path, ref_num, devices, service_addresses, message_types):
     """ When called, this function will generate and queue a get device
         scheduled state message for every device in the device list
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_create_get_device_scheduled_state_msg')
+
     # Initialize result list
     out_msg_list = []
 
@@ -39,7 +43,7 @@ def create_get_device_scheduled_state_msg(log, ref_num, devices, service_address
            device.dev_rule == 'dusk_to_dawn' or \
            device.dev_rule == '':
             out_msg = GetDeviceScheduledStateMessage(
-                log=log,
+                log_path,
                 ref=ref_num.new(),
                 dest_addr=service_addresses['schedule_addr'],
                 dest_port=service_addresses['schedule_port'],
@@ -57,17 +61,20 @@ def create_get_device_scheduled_state_msg(log, ref_num, devices, service_address
 
 
 # Process get device scheduled state message **********************************
-def process_get_device_scheduled_state_msg(log, msg, service_addresses):
+def process_get_device_scheduled_state_msg(log_path, msg, service_addresses):
     """ If a mis-directed get device scheduled state message is received, this
         function will update destination addr and port values in the message to
         the appropraite values for the schedule service, then queue it to be
         sent to the schedule service via the outgoing message queue
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_get_device_scheduled_state_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into GDSS message class
-    message = GetDeviceScheduledStateMessage(log=log)
+    message = GetDeviceScheduledStateMessage(log_path)
     message.complete = msg
 
     # Modify GDSS message to forward to schedule service
@@ -83,18 +90,21 @@ def process_get_device_scheduled_state_msg(log, msg, service_addresses):
 
 
 # Process get device scheduled state ACK message ******************************
-def process_get_device_scheduled_state_msg_ack(log, ref_num, devices, msg, service_addresses, message_types):
+def process_get_device_scheduled_state_msg_ack(log_path, ref_num, devices, msg, service_addresses, message_types):
     """ When a get device scheduled state ACK message is received, this
         function will first check if the command in the message matches the
         last command sent to the device and if a change of state is detected
         it will create a new set device state message to send to the device
         via the outgoing message queue
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_get_device_scheduled_state_msg_ack')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = GetDeviceScheduledStateMessageACK(log=log)
+    message = GetDeviceScheduledStateMessageACK(log_path)
     message.complete = msg
 
     # Search device table to find device name
@@ -117,7 +127,7 @@ def process_get_device_scheduled_state_msg_ack(log, ref_num, devices, msg, servi
                 # Build new message to forward to wemo service
                 log.debug('Generating message to wemo service')
                 out_msg = SetDeviceStateMessage(
-                    log=log,
+                    log_path,
                     ref=ref_num.new(),
                     dest_addr=service_addresses['wemo_addr'],
                     dest_port=service_addresses['wemo_port'],

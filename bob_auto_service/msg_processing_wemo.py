@@ -8,6 +8,7 @@ import os
 import sys
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from bob_auto_service.tools.log_support import setup_function_logger    
 from bob_auto_service.tools.device import search_device_list
 from bob_auto_service.messages.get_device_state import GetDeviceStateMessage
 from bob_auto_service.messages.get_device_state_ack import GetDeviceStateMessageACK
@@ -27,7 +28,7 @@ __status__ = "Development"
 
 
 # Process get device state message ********************************************
-def process_get_device_state_msg(log, msg, service_addresses):
+def process_get_device_state_msg(log_path, msg, service_addresses):
     """ Get Device Status
         When a mis-directed GDS message is received, this function will:
         1) Update destination addr and port values in the GDS message to the
@@ -36,11 +37,14 @@ def process_get_device_state_msg(log, msg, service_addresses):
            current values known
         3) Queue the message to be sent to the wemo service
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_get_device_state_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = GetDeviceStateMessage(log=log)
+    message = GetDeviceStateMessage(log_path)
     message.complete = msg
 
     # Modify CCS message to forward to wemo service
@@ -56,18 +60,21 @@ def process_get_device_state_msg(log, msg, service_addresses):
 
 
 # Process get device state ACK message ****************************************
-def process_get_device_state_msg_ack(log, devices, msg):
+def process_get_device_state_msg_ack(log_path, devices, msg):
     """ Get Device Status ACK
         When a GDS-ACK message is received, this function will:
         1) Search for the device in the active device table
         2) If found, update the status and last-seen values in the device
            table to the values encoded in the message.
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_get_device_state_msg_ack')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = GetDeviceStateMessageACK(log=log)
+    message = GetDeviceStateMessageACK(log_path)
     message.complete = msg
 
     # Search device table to find device name
@@ -92,7 +99,7 @@ def process_get_device_state_msg_ack(log, devices, msg):
 
 
 # Process set device state message ********************************************
-def process_set_device_state_msg(log, msg, service_addresses):
+def process_set_device_state_msg(log_path, msg, service_addresses):
     """ Set Device Status
         When a mis-directed SDS message is received, this function will:
         1) Update destination addr and port values in the SDS message to the
@@ -101,11 +108,14 @@ def process_set_device_state_msg(log, msg, service_addresses):
            current values known
         3) Queue the message to be sent to the wemo service
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_set_device_state_msg')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = SetDeviceStateMessage(log=log)
+    message = SetDeviceStateMessage(log_path)
     message.complete = msg
 
     message.dest_addr=service_addresses['wemo_addr']
@@ -120,18 +130,21 @@ def process_set_device_state_msg(log, msg, service_addresses):
 
 
 # Process get device state ACK message ****************************************
-def process_set_device_state_msg_ack(log, devices, msg):
+def process_set_device_state_msg_ack(log_path, devices, msg):
     """ Set Device Status ACK
         When a SDS-ACK message is received, this function will:
         1) Search for the device in the active device table
         2) If found, update the status and last-seen values in the device
            table to the values encoded in the message.
     """
+    # Configure logging for this function
+    log = setup_function_logger(log_path, 'Function_process_set_device_state_msg_ack')
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = SetDeviceStateMessageACK(log=log)
+    message = SetDeviceStateMessageACK(log_path)
     message.complete = msg
 
     # Search device table to find device name
