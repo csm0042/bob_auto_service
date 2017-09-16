@@ -71,7 +71,7 @@ def main():
     except Exception:
         LOGGER.debug('Failed to create socket listening connection at %s:%s',
                      SERVICE_ADDRESSES['automation_addr'],
-                    SERVICE_ADDRESSES['automation_port'])
+                     SERVICE_ADDRESSES['automation_port'])
         sys.exit()
 
     # Create main task for this service
