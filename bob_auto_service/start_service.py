@@ -9,7 +9,6 @@ import os
 import sys
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from bob_auto_service.tools.log_support import setup_function_logger
 from bob_auto_service.configure import ConfigureService
 from bob_auto_service.service_main import MainTask
 from bob_auto_service.tools.ref_num import RefNum
@@ -33,17 +32,17 @@ parent_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 config_file = os.path.join(parent_path, 'config.ini')
 print("\n\nUsing Config file:\n" + config_file + "\n\n")
 SERVICE_CONFIG = ConfigureService(config_file)
-LOG_PATH = SERVICE_CONFIG.get_logger_path()
+LOGGER = SERVICE_CONFIG.get_logger()
 SERVICE_ADDRESSES = SERVICE_CONFIG.get_servers()
 MESSAGE_TYPES = SERVICE_CONFIG.get_message_types()
 CUR_LAT, CUR_LONG = SERVICE_CONFIG.get_location()
 DEVICES = SERVICE_CONFIG.get_devices()
 
-REF_NUM = RefNum(LOG_PATH)
+REF_NUM = RefNum(LOGGER)
 LOOP = asyncio.get_event_loop()
-COMM_HANDLER = MessageHandler(LOG_PATH, LOOP)
+COMM_HANDLER = MessageHandler(LOGGER, LOOP)
 MAINTASK = MainTask(
-    LOG_PATH,
+    logger=LOGGER,
     ref=REF_NUM,
     devices=DEVICES,
     msg_in_queue=COMM_HANDLER.msg_in_queue,
@@ -55,59 +54,56 @@ MAINTASK = MainTask(
 # Main ************************************************************************
 def main():
     """ Main application routine """
-    # Configure logger
-    log = setup_function_logger(LOG_PATH, 'Function_Main')
-
-    log.debug('Starting main()')
+    LOGGER.debug('Starting main()')
 
     # Create incoming message server
     try:
-        log.debug('Creating incoming message listening server at [%s:%s]',
-                  SERVICE_ADDRESSES['automation_addr'],
-                  SERVICE_ADDRESSES['automation_port'])
+        LOGGER.debug('Creating incoming message listening server at [%s:%s]',
+                     SERVICE_ADDRESSES['automation_addr'],
+                     SERVICE_ADDRESSES['automation_port'])
         msg_in_server = asyncio.start_server(
             COMM_HANDLER.handle_msg_in,
             host=SERVICE_ADDRESSES['automation_addr'],
             port=int(SERVICE_ADDRESSES['automation_port']))
-        log.debug('Wrapping servier in future task and scheduling for '
-                  'execution')
+        LOGGER.debug('Wrapping servier in future task and scheduling for '
+                     'execution')
         msg_in_task = LOOP.run_until_complete(msg_in_server)
     except Exception:
-        log.debug('Failed to create socket listening connection at %s:%s',
-                  SERVICE_ADDRESSES['automation_addr'],
-                  SERVICE_ADDRESSES['automation_port'])
+        LOGGER.debug('Failed to create socket listening connection at %s:%s',
+                     SERVICE_ADDRESSES['automation_addr'],
+                    SERVICE_ADDRESSES['automation_port'])
         sys.exit()
 
     # Create main task for this service
-    log.debug('Scheduling main task for execution')
+    LOGGER.debug('Scheduling main task for execution')
     asyncio.ensure_future(MAINTASK.run())
 
     # Create outgoing message task
-    log.debug('Scheduling outgoing message task for execution')
+    LOGGER.debug('Scheduling outgoing message task for execution')
     asyncio.ensure_future(COMM_HANDLER.handle_msg_out())
 
     # Serve requests until Ctrl+C is pressed
-    log.info('Automation Service')
-    log.info('Serving on {}'.format(msg_in_task.sockets[0].getsockname()))
-    log.info('Press CTRL+C to exit')
+    LOGGER.info('Automation Service')
+    LOGGER.info('Serving on {}'.format(msg_in_task.sockets[0].getsockname()))
+    LOGGER.info('Press CTRL+C to exit')
     try:
         LOOP.run_forever()
     except asyncio.CancelledError:
-        log.info('All tasks have been cancelled')
+        LOGGER.info('All tasks have been cancelled')
     except KeyboardInterrupt:
         pass
     finally:
-        log.info('Shutting down incoming message server')
+        LOGGER.info('Shutting down incoming message server')
         msg_in_server.close()
-        log.info('Finding all running tasks to shut down')
+        LOGGER.info('Finding all running tasks to shut down')
         pending = asyncio.Task.all_tasks()
-        log.info('[%s] Task still running.  Closing them now', str(len(pending)))
+        LOGGER.info('[%s] Task still running.  Closing them now', str(len(pending)))
         for i, task in enumerate(pending):
             with suppress(asyncio.CancelledError):
-                log.info('Waiting for task [%s] to shut down', i)
+                LOGGER.info('Waiting for task [%s] to shut down', i)
                 task.cancel()
                 LOOP.run_until_complete(task)
-        log.info('Shutdown complete.  Terminating execution LOOP')
+        LOGGER.info('Shutdown complete.  Terminating execution LOOP')
 
     # Terminate the execution LOOP
     LOOP.close()

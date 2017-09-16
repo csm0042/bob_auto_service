@@ -39,7 +39,7 @@ def process_get_device_state_msg(log_path, msg, service_addresses):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_get_device_state_msg')
-
+    print(__name__)    
     # Initialize result list
     out_msg_list = []
 
@@ -69,7 +69,7 @@ def process_get_device_state_msg_ack(log_path, devices, msg):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_get_device_state_msg_ack')
-
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 
@@ -110,7 +110,7 @@ def process_set_device_state_msg(log_path, msg, service_addresses):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_set_device_state_msg')
-
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 

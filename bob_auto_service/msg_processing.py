@@ -3,6 +3,8 @@
 """
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
+import copy
+import logging
 import os
 import sys
 if __name__ == "__main__":
@@ -23,21 +25,21 @@ __email__ = "csmaue@gmail.com"
 __status__ = "Development"
 
 
-def create_heartbeat_msg(log_path, ref_num, destinations, source_addr, source_port, message_types):
+def create_heartbeat_msg(logger, ref_num, destinations, source_addr, source_port, message_types):
     """ function to create one or more heartbeat messages """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_create_heartbeat_msg')
+    logger = logger or logging.getLogger(__name__)
 
     # Initialize result list
-    log.debug('Clearing outgoing message list')
+    logger.debug('Clearing outgoing message list')
     out_msg_list = []
 
     # Generate a heartbeat message for each destination given
     for entry in destinations:
-        log.debug('Creating heartbeat to send to: %s:%s',
+        logger.debug('Creating heartbeat to send to: %s:%s',
                   entry[0], entry[1])
         out_msg = HeartbeatMessage(
-            log_path,
+            logger=logger,
             ref=ref_num.new(),
             dest_addr=entry[0],
             dest_port=entry[1],
@@ -46,30 +48,30 @@ def create_heartbeat_msg(log_path, ref_num, destinations, source_addr, source_po
             msg_type=message_types['heartbeat']
         )
         # Load message into output list
-        log.debug('Loading completed msg: %s', out_msg.complete)
-        out_msg_list.append(out_msg.complete)
+        logger.debug('Loading completed msg: %s', out_msg.complete)
+        out_msg_list.append(copy.copy(out_msg.complete))
 
     # Return response message
-    log.debug('Returning generated messages: %s', out_msg_list)
+    logger.debug('Returning generated messages: %s', out_msg_list)
     return out_msg_list
 
 
-def process_heartbeat_msg(log_path, ref_num, msg, message_types):
+def process_heartbeat_msg(logger, ref_num, msg, message_types):
     """ function to ack wake-up requests to wemo service """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_heartbeat_msg')
+    log = setup_function_logger(logger, 'Function_process_heartbeat_msg')
 
     # Initialize result list
     out_msg_list = []
 
     # Map message into wemo wake-up message class
-    message = HeartbeatMessage(log_path)
+    message = HeartbeatMessage(logger)
     message.complete = msg
 
     # Send response indicating query was executed
-    log.debug('Building response message header')
+    logger.debug('Building response message header')
     out_msg = HeartbeatMessageACK(
-        log_path,
+        logger=logger,
         ref=ref_num.new(),
         dest_addr=message.source_addr,
         dest_port=message.source_port,
@@ -78,8 +80,8 @@ def process_heartbeat_msg(log_path, ref_num, msg, message_types):
         msg_type=message_types['heartbeat_ack'])
 
     # Load message into output list
-    log.debug('Loading completed msg: [%s]', out_msg.complete)
-    out_msg_list.append(out_msg.complete)
+    logger.debug('Loading completed msg: [%s]', out_msg.complete)
+    out_msg_list.append(copy.copy(out_msg.complete))
 
     # Return response message
     return out_msg_list

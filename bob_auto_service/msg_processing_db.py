@@ -40,7 +40,7 @@ def process_log_status_update_msg(log_path, msg, service_addresses):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_log_status_update_msg')
-
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 
@@ -68,7 +68,7 @@ def process_log_status_update_msg_ack(log_path, msg):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_log_status_update_ack_msg')
-    
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 
@@ -90,7 +90,7 @@ def process_return_command_msg(log_path, msg, service_addresses):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_return_command_msg')
-
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 

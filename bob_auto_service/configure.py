@@ -11,7 +11,6 @@ import os
 import sys
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from bob_auto_service.tools.log_support import setup_log_handlers
 from bob_auto_service.tools.device import Device
 
 
@@ -24,6 +23,15 @@ __version__ = "1.0.0"
 __maintainer__ = "Christopher Maue"
 __email__ = "csmaue@gmail.com"
 __status__ = "Development"
+
+
+class LogFilter(logging.Filter):
+
+    def filter(self, record):
+
+        record.ip = choice(ContextFilter.IPS)
+        record.user = choice(ContextFilter.USERS)
+        return True
 
 
 # Config Function Def *********************************************************
@@ -39,6 +47,9 @@ class ConfigureService(object):
         self.device_id = str()
         self.i = int()
         self.device = None
+        self.func_names = {}
+        self.handlers = []
+        self.log_path = str()
         # Define connection to configuration file
         self.config_file = configparser.ConfigParser()
         # Configure logger
@@ -48,18 +59,35 @@ class ConfigureService(object):
     def get_logger(self):
         # Set up application logging
         self.config_file.read(self.filename)
-        self.log = setup_log_handlers(
-            __file__,
-            self.config_file['LOG FILES']['automation_debug_log_file'],
-            self.config_file['LOG FILES']['automation_info_log_file'])
+        self.log_path = self.config_file['LOG FILES']['log_file_path']
+        self.log = logging.getLogger('master')
+        self.log.setLevel(logging.DEBUG)
+        self.log.handlers = []
+        os.makedirs(self.log_path, exist_ok=True)
+        # Console handler
+        self.handlers = []
+        self.ch = logging.StreamHandler(sys.stdout)
+        self.ch.setLevel(logging.INFO)
+        self.cf = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        self.ch.setFormatter(self.cf)
+        self.log.addHandler(self.ch)
+        self.log.info('Console logger handler created and applied')
+        # File handler
+        self.fh = logging.handlers.TimedRotatingFileHandler(
+            os.path.join(self.log_path, "Debug.log"),
+            when='d',
+            interval=1,
+            backupCount=4
+        )
+        self.fh.setLevel(logging.DEBUG)
+        self.ff = logging.Formatter(
+            '%(asctime)-25s %(levelname)-10s '
+            '%(funcName)-22s %(message)s'
+        )
+        self.fh.setFormatter(self.ff)
+        self.log.addHandler(self.fh)
         # Return configured objects to main program
         return self.log
-
-
-    def get_logger_path(self):
-        # Set up application logging storage paths
-        self.config_file.read(self.filename)
-        return self.config_file['LOG FILES']['log_file_path']
 
 
     def get_servers(self):

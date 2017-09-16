@@ -33,7 +33,7 @@ def create_get_device_scheduled_state_msg(log_path, ref_num, devices, service_ad
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_create_get_device_scheduled_state_msg')
-
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 
@@ -69,7 +69,7 @@ def process_get_device_scheduled_state_msg(log_path, msg, service_addresses):
     """
     # Configure logging for this function
     log = setup_function_logger(log_path, 'Function_process_get_device_scheduled_state_msg')
-
+    print(__name__)
     # Initialize result list
     out_msg_list = []
 
