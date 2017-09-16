@@ -24,7 +24,7 @@ __status__ = "Development"
 class Sun(object):
     def __init__(self, latitude, longitude, offset_hours, logger):
         # Configure logger
-        self._logger = logger or logging.getLogger(__name__)
+        self.logger = logger or logging.getLogger(__name__)
         # Create other class objects
         self._latitude = latitude
         self._longitude = longitude
@@ -72,7 +72,7 @@ class Sun(object):
         self._s = None
         self.calc()
         self._last_calc = datetime.datetime.now()
-        self._logger.debug('Init complete for Sun class for coordinates '
+        self.logger.debug('Init complete for Sun class for coordinates '
                            '%s by %s', self._latitude, self._longitude)
 
 
@@ -85,38 +85,38 @@ class Sun(object):
         # If no time is passed to the function, assume current date/time
         if self._when is None:
             self._when = datetime.datetime.now()
-            self._logger.debug(
+            self.logger.debug(
                 'No time passed into class.  Running with current system datetime')
         else:
             self._when = datetime.datetime.combine(self._when, datetime.time(12, 0))
-            self._logger.debug('Calculating sun rise, noon, and set for %s', self._when)
+            self.logger.debug('Calculating sun rise, noon, and set for %s', self._when)
 
         # datetime days are numbered in the Gregorian calendar while the calculations
         # from NOAA are distibuted as OpenOffice spreadsheets with days numbered from
         # 1/1/1900. The difference are those numbers taken for 18/12/2010
         self._day = self._when.toordinal() - (734124 - 40529)
-        self._logger.debug('Calculated _day as %s', self._day)
+        self.logger.debug('Calculated _day as %s', self._day)
         self._t = self._when.time()
-        self._logger.debug('Calculated _t as %s', self._t)
+        self.logger.debug('Calculated _t as %s', self._t)
         self._time = (self._t.hour + self._t.minute / 60.0 + self._t.second / 3600.0) / 24.0
-        self._logger.debug('Calculated _time as %s', self._time)
+        self.logger.debug('Calculated _time as %s', self._time)
 
         self._timezone = 0
         self._offset = self._when.utcoffset()
-        self._logger.debug('Calculated _offset as %s', self._offset)
+        self.logger.debug('Calculated _offset as %s', self._offset)
         if not self._offset is None:
             self._timezone = self._offset.seconds / 3600.0
-            self._logger.debug('Calculated _timezone as %s', self._timezone)
+            self.logger.debug('Calculated _timezone as %s', self._timezone)
 
         # calculate offset timedelta based on offset hours passed in
         self._offset = datetime.timedelta(hours=self._offset_hours)
-        self._logger.debug('Calculated _offset as %s', self._offset)
+        self.logger.debug('Calculated _offset as %s', self._offset)
 
         # Calculate julian day and century
         self._jday = self._day + 2415018.5 + self._time - self._timezone / 24
-        self._logger.debug('Calculated _jday as %s', self._jday)
+        self.logger.debug('Calculated _jday as %s', self._jday)
         self._jcent = (self._jday - 2451545) / 36525
-        self._logger.debug('Calculated _jcent as %s', self._jcent)
+        self.logger.debug('Calculated _jcent as %s', self._jcent)
 
         # More calcs
         self._manom = 357.52911 + self._jcent * (35999.05029 - 0.0001537 * self._jcent)

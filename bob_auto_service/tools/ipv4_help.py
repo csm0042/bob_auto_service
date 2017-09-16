@@ -6,7 +6,6 @@
 import logging
 import re
 import sys
-from bob_auto_service.tools.log_support import setup_function_logger
 
 
 # Authorship Info *************************************************************
@@ -39,19 +38,3 @@ def check_ipv4(address):
         return True
     else:
         return False
-
-
-if __name__ == "__main__":
-    root = logging.getLogger()
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.DEBUG)
-    root.addHandler(handler)
-
-    print("\n\nTesting check_ipv4 function")
-    for i in range(250, 260, 1):
-        addr = "192.168.1." + str(i)
-        if check_ipv4(addr) is True:
-            print(addr + " is valid")
-        else:
-            print(addr + " is not valid")
-    print("\n\n")

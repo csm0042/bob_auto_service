@@ -24,19 +24,19 @@ __status__ = "Development"
 
 
 # Search device list by name **************************************************
-def search_device_list(log, devices, dev_name):
+def search_device_list(logger, devices, dev_name):
     """ function to search a list of items of Device class items and return
         the index of the item in the list that has a match in the dev_name
         element
     """
     # Configure logger
-    log = log or logging.getLogger(__name__)
-    log.debug('Starting search of device table for matching name: %s', dev_name)
+    logger = logger or logging.getLogger(__name__)
+    logger.debug('Starting search of device table for matching name: %s', dev_name)
     for i, d in enumerate(devices):
         if dev_name.lower() == d.dev_name.lower():
-            log.debug('Match found at index: %s', i)
+            logger.debug('Match found at index: %s', i)
             return i
-    log.debug('No match found for device name: %s', dev_name)
+    logger.debug('No match found for device name: %s', dev_name)
     return None
 
 
@@ -44,9 +44,9 @@ def search_device_list(log, devices, dev_name):
 class Device(object):
     """ Class used to define the objects and methods associated with a physical
     device that will be interfaced to/from this application """
-    def __init__(self, log=None, **kwargs):
+    def __init__(self, logger, **kwargs):
         # Configure logger
-        self.log = log or logging.getLogger(__name__)
+        self.logger = logger or logging.getLogger(__name__)
 
         # Create class instance objects
         self._dev_name = str()
@@ -65,45 +65,45 @@ class Device(object):
             for key, value in kwargs.items():
                 if key == "dev_name":
                     self.dev_name = value
-                    self.log.debug('Device name set during __init__ '
-                                   'to: %s', self.dev_name)
+                    self.logger.debug('Device name set during __init__ '
+                                      'to: %s', self.dev_name)
                 if key == "dev_type":
                     self.dev_type = value
-                    self.log.debug('Device type set during __init__ '
-                                   'to: %s', self.dev_type)
+                    self.logger.debug('Device type set during __init__ '
+                                      'to: %s', self.dev_type)
                 if key == "dev_addr":
                     self.dev_addr = value
-                    self.log.debug('Device address set during __init__ '
-                                   'to: %s', self.dev_addr)
+                    self.logger.debug('Device address set during __init__ '
+                                      'to: %s', self.dev_addr)
                 if key == "dev_cmd":
                     self.dev_cmd = value
-                    self.log.debug('Device command set during __init__ '
-                                   'to: %s', self.dev_cmd)
+                    self.logger.debug('Device command set during __init__ '
+                                      'to: %s', self.dev_cmd)
                 if key == "dev_status":
                     self.dev_status = value
-                    self.log.debug('Device status set during __init__ '
-                                   'to: %s', self.dev_status)
+                    self.logger.debug('Device status set during __init__ '
+                                      'to: %s', self.dev_status)
                 if key == "dev_status_mem":
                     self.dev_status_mem = value
-                    self.log.debug('Device status mem set during __init__ '
-                                   'to: %s', self.dev_status_mem)                                   
+                    self.logger.debug('Device status mem set during __init__ '
+                                      'to: %s', self.dev_status_mem)                                   
                 if key == "dev_last_seen":
                     self.dev_last_seen = value
-                    self.log.debug('Device last seen set during __init__ '
-                                   'to: %s', self.dev_last_seen)
+                    self.logger.debug('Device last seen set during __init__ '
+                                      'to: %s', self.dev_last_seen)
                 if key == "dev_last_seen_mem":
                     self.dev_last_seen_mem = value
-                    self.log.debug('Device last seen mem set during __init__ '
-                                   'to: %s', self.dev_last_seen_mem)                                   
+                    self.logger.debug('Device last seen mem set during __init__ '
+                                      'to: %s', self.dev_last_seen_mem)                                   
                 if key == "dev_rule":
                     self.dev_rule = value
-                    self.log.debug('Device rule set during __init__ '
-                                   'to: %s', self.dev_rule)
+                    self.logger.debug('Device rule set during __init__ '
+                                      'to: %s', self.dev_rule)
 
     # device name field *******************************************************
     @property
     def dev_name(self):
-        self.log.debug('Returning current device name: %s', self._dev_name)
+        self.logger.debug('Returning current device name: %s', self._dev_name)
         return self._dev_name
 
     @dev_name.setter
@@ -112,12 +112,12 @@ class Device(object):
             self._dev_name = value.lower()
         else:
             self._dev_name = (str(value)).lower()
-        self.log.debug('Device name updated to: %s', self._dev_name)
+        self.logger.debug('Device name updated to: %s', self._dev_name)
 
     # device type field *******************************************************
     @property
     def dev_type(self):
-        self.log.debug('Returning current device type: %s', self._dev_type)
+        self.logger.debug('Returning current device type: %s', self._dev_type)
         return self._dev_type
 
     @dev_type.setter
@@ -126,12 +126,12 @@ class Device(object):
             self._dev_type = value.lower()
         else:
             self._dev_type = (str(value)).lower()
-        self.log.debug('Device type updated to: %s', self._dev_type)
+        self.logger.debug('Device type updated to: %s', self._dev_type)
 
     # device address field ****************************************************
     @property
     def dev_addr(self):
-        self.log.debug('Returning current device address: %s', self._dev_addr)
+        self.logger.debug('Returning current device address: %s', self._dev_addr)
         return self._dev_addr
 
     @dev_addr.setter
@@ -139,20 +139,20 @@ class Device(object):
         if isinstance(value, str):
             if check_ipv4(value) is True:
                 self._dev_addr = value
-                self.log.debug('Device address updated to: %s', self._dev_addr)
+                self.logger.debug('Device address updated to: %s', self._dev_addr)
             else:
-                self.log.warning('Invalid address: %s', value)
+                self.logger.warning('Invalid address: %s', value)
         else:
             if check_ipv4(str(value)) is True:
                 self._dev_addr = str(value)
-                self.log.debug('Device address updated to: %s', self._dev_addr)
+                self.logger.debug('Device address updated to: %s', self._dev_addr)
             else:
-                self.log.warning('Invalid address: %s', value)
+                self.logger.warning('Invalid address: %s', value)
 
     # device command field ****************************************************
     @property
     def dev_cmd(self):
-        self.log.debug('Returning current device command: %s', self._dev_cmd)
+        self.logger.debug('Returning current device command: %s', self._dev_cmd)
         return self._dev_cmd
 
     @dev_cmd.setter
@@ -161,12 +161,12 @@ class Device(object):
             self._dev_cmd = value.lower()
         else:
             self._dev_cmd = (str(value)).lower()
-        self.log.debug('Device command updated to: %s', self._dev_cmd)
+        self.logger.debug('Device command updated to: %s', self._dev_cmd)
 
     # device status field *****************************************************
     @property
     def dev_status(self):
-        self.log.debug('Returning current device status: %s', self._dev_status)
+        self.logger.debug('Returning current device status: %s', self._dev_status)
         return self._dev_status
 
     @dev_status.setter
@@ -175,12 +175,12 @@ class Device(object):
             self._dev_status = value.lower()
         else:
             self._dev_status = (str(value)).lower()
-        self.log.debug('Device status updated to: %s', self._dev_status)
+        self.logger.debug('Device status updated to: %s', self._dev_status)
 
     # device status memory field **********************************************
     @property
     def dev_status_mem(self):
-        self.log.debug('Returning current device status mem: %s', self._dev_status_mem)
+        self.logger.debug('Returning current device status mem: %s', self._dev_status_mem)
         return self._dev_status_mem
 
     @dev_status_mem.setter
@@ -189,12 +189,12 @@ class Device(object):
             self._dev_status_mem = value.lower()
         else:
             self._dev_status_mem = (str(value)).lower()
-        self.log.debug('Device status mem updated to: %s', self._dev_status_mem)        
+        self.logger.debug('Device status mem updated to: %s', self._dev_status_mem)        
 
     # device last seen field **************************************************
     @property
     def dev_last_seen(self):
-        self.log.debug('Returning current device last seen: %s',
+        self.logger.debug('Returning current device last seen: %s',
                        self._dev_last_seen)
         return self._dev_last_seen
 
@@ -215,12 +215,12 @@ class Device(object):
                 self._dev_last_seen = value[:19]
             else:
                 self._dev_last_seen = value
-        self.log.debug('Device last seen updated to: %s', self._dev_last_seen)
+        self.logger.debug('Device last seen updated to: %s', self._dev_last_seen)
 
     # device last seen field **************************************************
     @property
     def dev_last_seen_mem(self):
-        self.log.debug('Returning current device last seen mem: %s',
+        self.logger.debug('Returning current device last seen mem: %s',
                        self._dev_last_seen_mem)
         return self._dev_last_seen_mem
 
@@ -241,13 +241,13 @@ class Device(object):
                 self._dev_last_seen_mem = value[:19]
             else:
                 self._dev_last_seen_mem = value
-        self.log.debug('Device last seen mem updated to: %s',
-                       self._dev_last_seen_mem)
+        self.logger.debug('Device last seen mem updated to: %s',
+                          self._dev_last_seen_mem)
 
     # device rule field *******************************************************
     @property
     def dev_rule(self):
-        self.log.debug('Returning current device rule: %s', self._dev_rule)
+        self.logger.debug('Returning current device rule: %s', self._dev_rule)
         return self._dev_rule
 
     @dev_rule.setter
@@ -256,4 +256,4 @@ class Device(object):
             self._dev_rule = value.lower()
         else:
             self._dev_rule = (str(value)).lower()
-        self.log.debug('Device rule updated to: %s', self._dev_rule)
+        self.logger.debug('Device rule updated to: %s', self._dev_rule)

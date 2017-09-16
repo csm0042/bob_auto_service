@@ -20,9 +20,9 @@ __status__ = "Development"
 
 # Daylight Savings Time Class *************************************************
 class USdst(object):
-    def __init__(self, log=None):
+    def __init__(self, logger):
         # Configure logger
-        self.log = log or logging.getLogger(__name__)
+        self.logger = logger or logging.getLogger(__name__)
         # Init tags        
         self.dt = datetime.datetime.now()
         self.marchStartsOn = datetime.date(2016,3,1)
@@ -42,8 +42,8 @@ class USdst(object):
         if isinstance(value, datetime.datetime) is True:
             self.__dt = value
         else:
-            self.log.debug('Improper type attmpted to load into self.dt '
-                           '(should be type: datetime.datetime)')
+            self.logger.debug('Improper type attmpted to load into self.dt '
+                              '(should be type: datetime.datetime)')
 
     @property
     def marchStartsOn(self):
@@ -54,8 +54,8 @@ class USdst(object):
         if isinstance(value, datetime.date) is True:
             self.__marchStartsOn = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.marchStartsOn (should be type: datetime.date)')
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.marchStartsOn (should be type: datetime.date)')
 
     @property
     def marchFirstSun(self):
@@ -66,8 +66,8 @@ class USdst(object):
         if isinstance(value, int) is True:
             self.__marchFirstSun = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.marchFirstSun (should be type: int)')
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.marchFirstSun (should be type: int)')
 
     @property
     def marchSecondSun(self):
@@ -78,8 +78,8 @@ class USdst(object):
         if isinstance(value, int) is True:
             self.__marchSecondSun = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.marchSecondSun (should be type: int)')                        
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.marchSecondSun (should be type: int)')                        
 
     @property
     def novStartsOn(self):
@@ -90,8 +90,8 @@ class USdst(object):
         if isinstance(value, datetime.date) is True:
             self.__novStartsOn = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.novStartsOn (should be type: datetime.date)')
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.novStartsOn (should be type: datetime.date)')
 
     @property
     def novFirstSun(self):
@@ -102,8 +102,8 @@ class USdst(object):
         if isinstance(value, int) is True:
             self.__novFirstSun = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.novFirstSun (should be type: int)')
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.novFirstSun (should be type: int)')
 
     @property
     def dstStarts(self):
@@ -114,8 +114,8 @@ class USdst(object):
         if isinstance(value, datetime.datetime) is True:
             self.__dstStarts = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.dstStarts (should be type: datetime.datetime)')
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.dstStarts (should be type: datetime.datetime)')
 
     @property
     def dstEnds(self):
@@ -126,8 +126,8 @@ class USdst(object):
         if isinstance(value, datetime.datetime) is True:
             self.__dstEnds = value
         else:
-            self.log.debug('Improper type attmpted to load into '
-                           'self.dstEnds (should be type: datetime.datetime)')
+            self.logger.debug('Improper type attmpted to load into '
+                              'self.dstEnds (should be type: datetime.datetime)')
 
 
     def is_active(self, **kwargs):
@@ -157,10 +157,3 @@ class USdst(object):
             return True
         else:
             return False
-
-
-if __name__ == "__main__":
-    dst_check = USdst()
-    dt_to_check = datetime.datetime.combine(
-        datetime.date(2016,3,13), datetime.datetime.now().time())
-    print(dst_check.is_active(datetime=dt_to_check))
