@@ -59,7 +59,7 @@ def create_heartbeat_msg(logger, ref_num, destinations, source_addr, source_port
 def process_heartbeat_msg(logger, ref_num, msg, message_types):
     """ function to ack wake-up requests to wemo service """
     # Configure logging for this function
-    log = setup_function_logger(logger, 'Function_process_heartbeat_msg')
+    logger = logger or logging.getLogger(__name__)
 
     # Initialize result list
     out_msg_list = []

@@ -4,11 +4,11 @@
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import copy
+import logging
 import os
 import sys
 if __name__ == "__main__":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from bob_auto_service.tools.log_support import setup_function_logger    
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) 
 from bob_auto_service.tools.device import search_device_list
 from bob_auto_service.messages.get_device_state import GetDeviceStateMessage
 from bob_auto_service.messages.get_device_state_ack import GetDeviceStateMessageACK
@@ -28,7 +28,7 @@ __status__ = "Development"
 
 
 # Process get device state message ********************************************
-def process_get_device_state_msg(log_path, msg, service_addresses):
+def process_get_device_state_msg(logger, msg, service_addresses):
     """ Get Device Status
         When a mis-directed GDS message is received, this function will:
         1) Update destination addr and port values in the GDS message to the
@@ -38,13 +38,13 @@ def process_get_device_state_msg(log_path, msg, service_addresses):
         3) Queue the message to be sent to the wemo service
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_get_device_state_msg')
-    print(__name__)    
+    logger = logger or logging.getLogger(__name__)
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = GetDeviceStateMessage(log_path)
+    message = GetDeviceStateMessage(logger)
     message.complete = msg
 
     # Modify CCS message to forward to wemo service
@@ -52,7 +52,7 @@ def process_get_device_state_msg(log_path, msg, service_addresses):
     message.dest_port = service_addresses['wemo_port']
 
     # Load message into output list
-    log.debug('Loading completed msg: [%s]', message.complete)
+    logger.debug('Loading completed msg: [%s]', message.complete)
     out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
@@ -60,7 +60,7 @@ def process_get_device_state_msg(log_path, msg, service_addresses):
 
 
 # Process get device state ACK message ****************************************
-def process_get_device_state_msg_ack(log_path, devices, msg):
+def process_get_device_state_msg_ack(logger, devices, msg):
     """ Get Device Status ACK
         When a GDS-ACK message is received, this function will:
         1) Search for the device in the active device table
@@ -68,38 +68,38 @@ def process_get_device_state_msg_ack(log_path, devices, msg):
            table to the values encoded in the message.
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_get_device_state_msg_ack')
-    print(__name__)
+    logger = logger or logging.getLogger(__name__)
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = GetDeviceStateMessageACK(log_path)
+    message = GetDeviceStateMessageACK(logger)
     message.complete = msg
 
     # Search device table to find device name
-    log.debug('Searching device table for [%s]', message.dev_name)
-    dev_pointer = search_device_list(log, devices, message.dev_name)
-    log.debug('Match found at device table index: %s', dev_pointer)    
+    logger.debug('Searching device table for [%s]', message.dev_name)
+    dev_pointer = search_device_list(logger, devices, message.dev_name)
+    logger.debug('Match found at device table index: %s', dev_pointer)    
 
     # Update values based on message content
     if dev_pointer is not None:
-        log.debug('Updating device [%s] status to [%s] and last seen to [%s]',
-                  message.dev_name,
-                  message.dev_status,
-                  message.dev_last_seen)
+        logger.debug('Updating device [%s] status to [%s] and last seen to [%s]',
+                     message.dev_name,
+                     message.dev_status,
+                     message.dev_last_seen)
         devices[dev_pointer].dev_status = copy.copy(message.dev_status)
         devices[dev_pointer].dev_last_seen = copy.copy(message.dev_last_seen)
     else:
-        log.debug('Device [%s] not found in active device table. '
-                  'No further action being taken', message.dev_name)
+        logger.debug('Device [%s] not found in active device table. '
+                     'No further action being taken', message.dev_name)
 
     # Return response message
     return out_msg_list
 
 
 # Process set device state message ********************************************
-def process_set_device_state_msg(log_path, msg, service_addresses):
+def process_set_device_state_msg(logger, msg, service_addresses):
     """ Set Device Status
         When a mis-directed SDS message is received, this function will:
         1) Update destination addr and port values in the SDS message to the
@@ -109,20 +109,20 @@ def process_set_device_state_msg(log_path, msg, service_addresses):
         3) Queue the message to be sent to the wemo service
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_set_device_state_msg')
-    print(__name__)
+    logger = logger or logging.getLogger(__name__)
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = SetDeviceStateMessage(log_path)
+    message = SetDeviceStateMessage(logger)
     message.complete = msg
 
     message.dest_addr=service_addresses['wemo_addr']
     message.dest_port=service_addresses['wemo_port']
         
     # Load message into output list
-    log.debug('Loading completed msg: [%s]', message.complete)
+    logger.debug('Loading completed msg: [%s]', message.complete)
     out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
@@ -130,7 +130,7 @@ def process_set_device_state_msg(log_path, msg, service_addresses):
 
 
 # Process get device state ACK message ****************************************
-def process_set_device_state_msg_ack(log_path, devices, msg):
+def process_set_device_state_msg_ack(logger, devices, msg):
     """ Set Device Status ACK
         When a SDS-ACK message is received, this function will:
         1) Search for the device in the active device table
@@ -138,31 +138,31 @@ def process_set_device_state_msg_ack(log_path, devices, msg):
            table to the values encoded in the message.
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_set_device_state_msg_ack')
+    logger = logger or logging.getLogger(__name__)
 
     # Initialize result list
     out_msg_list = []
 
     # Map message into CCS message class
-    message = SetDeviceStateMessageACK(log_path)
+    message = SetDeviceStateMessageACK(logger)
     message.complete = msg
 
     # Search device table to find device name
-    log.debug('Searching device table for [%s]', message.dev_name)
-    dev_pointer = search_device_list(log, devices, message.dev_name)
-    log.debug('Match found at device table index: %s', dev_pointer)  
+    logger.debug('Searching device table for [%s]', message.dev_name)
+    dev_pointer = search_device_list(logger, devices, message.dev_name)
+    logger.debug('Match found at device table index: %s', dev_pointer)
 
     # Update values based on message content
     if dev_pointer is not None:
-        log.debug('Updating device [%s] status to [%s] and last seen to [%s]',
-                  message.dev_name,
-                  message.dev_status,
-                  message.dev_last_seen)
+        logger.debug('Updating device [%s] status to [%s] and last seen to [%s]',
+                     message.dev_name,
+                     message.dev_status,
+                     message.dev_last_seen)
         devices[dev_pointer].dev_status = copy.copy(message.dev_status)
         devices[dev_pointer].dev_last_seen = copy.copy(message.dev_last_seen)
     else:
-        log.debug('Device [%s] not found in active device table. '
-                  'No further action being taken', message.dev_name)
+        logger.debug('Device [%s] not found in active device table. '
+                     'No further action being taken', message.dev_name)
 
     # Return response message
     return out_msg_list

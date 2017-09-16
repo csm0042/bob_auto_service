@@ -4,11 +4,11 @@
 
 # Import Required Libraries (Standard, Third Party, Local) ********************
 import copy
+import logging
 import os
 import sys
 if __name__ == "__main__":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from bob_auto_service.tools.log_support import setup_function_logger    
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  
 from bob_auto_service.tools.device import search_device_list
 from bob_auto_service.messages.get_device_scheduled_state import GetDeviceScheduledStateMessage
 from bob_auto_service.messages.get_device_scheduled_state_ack import GetDeviceScheduledStateMessageACK
@@ -27,13 +27,13 @@ __status__ = "Development"
 
 
 # Create get device scheduled state message ***********************************
-def create_get_device_scheduled_state_msg(log_path, ref_num, devices, service_addresses, message_types):
+def create_get_device_scheduled_state_msg(logger, ref_num, devices, service_addresses, message_types):
     """ When called, this function will generate and queue a get device
         scheduled state message for every device in the device list
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_create_get_device_scheduled_state_msg')
-    print(__name__)
+    logger = logger or logging.getLogger(__name__)
+
     # Initialize result list
     out_msg_list = []
 
@@ -43,7 +43,7 @@ def create_get_device_scheduled_state_msg(log_path, ref_num, devices, service_ad
            device.dev_rule == 'dusk_to_dawn' or \
            device.dev_rule == '':
             out_msg = GetDeviceScheduledStateMessage(
-                log_path,
+                logger=logger,
                 ref=ref_num.new(),
                 dest_addr=service_addresses['schedule_addr'],
                 dest_port=service_addresses['schedule_port'],
@@ -53,7 +53,7 @@ def create_get_device_scheduled_state_msg(log_path, ref_num, devices, service_ad
                 dev_name=device.dev_name)
 
             # Load message into output list
-            log.debug('Loading completed msg: [%s]', out_msg.complete)
+            logger.debug('Loading completed msg: [%s]', out_msg.complete)
             out_msg_list.append(copy.copy(out_msg.complete))
 
     # Return response message
@@ -61,20 +61,20 @@ def create_get_device_scheduled_state_msg(log_path, ref_num, devices, service_ad
 
 
 # Process get device scheduled state message **********************************
-def process_get_device_scheduled_state_msg(log_path, msg, service_addresses):
+def process_get_device_scheduled_state_msg(logger, msg, service_addresses):
     """ If a mis-directed get device scheduled state message is received, this
         function will update destination addr and port values in the message to
         the appropraite values for the schedule service, then queue it to be
         sent to the schedule service via the outgoing message queue
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_get_device_scheduled_state_msg')
-    print(__name__)
+    logger = logger or logging.getLogger(__name__)
+
     # Initialize result list
     out_msg_list = []
 
     # Map message into GDSS message class
-    message = GetDeviceScheduledStateMessage(log_path)
+    message = GetDeviceScheduledStateMessage(logger)
     message.complete = msg
 
     # Modify GDSS message to forward to schedule service
@@ -82,7 +82,7 @@ def process_get_device_scheduled_state_msg(log_path, msg, service_addresses):
     message.dest_port = service_addresses['schedule_port']
 
     # Load message into output list
-    log.debug('Loading completed msg: [%s]', message.complete)
+    logger.debug('Loading completed msg: [%s]', message.complete)
     out_msg_list.append(copy.copy(message.complete))
 
     # Return response message
@@ -90,7 +90,7 @@ def process_get_device_scheduled_state_msg(log_path, msg, service_addresses):
 
 
 # Process get device scheduled state ACK message ******************************
-def process_get_device_scheduled_state_msg_ack(log_path, ref_num, devices, msg, service_addresses, message_types):
+def process_get_device_scheduled_state_msg_ack(logger, ref_num, devices, msg, service_addresses, message_types):
     """ When a get device scheduled state ACK message is received, this
         function will first check if the command in the message matches the
         last command sent to the device and if a change of state is detected
@@ -98,36 +98,36 @@ def process_get_device_scheduled_state_msg_ack(log_path, ref_num, devices, msg, 
         via the outgoing message queue
     """
     # Configure logging for this function
-    log = setup_function_logger(log_path, 'Function_process_get_device_scheduled_state_msg_ack')
+    logger = logger or logging.getLogger(__name__)
 
     # Initialize result list
     out_msg_list = []
 
     # Map message into LSU message class
-    message = GetDeviceScheduledStateMessageACK(log_path)
+    message = GetDeviceScheduledStateMessageACK(logger)
     message.complete = msg
 
     # Search device table to find device name
-    log.debug('Searching device table for [%s]', message.dev_name)
-    dev_pointer = search_device_list(log, devices, message.dev_name)
-    log.debug('Match found at device table index: %s', dev_pointer)
+    logger.debug('Searching device table for [%s]', message.dev_name)
+    dev_pointer = search_device_list(logger, devices, message.dev_name)
+    logger.debug('Match found at device table index: %s', dev_pointer)
 
     # Update values based on message content
     if dev_pointer is not None:
-        log.debug('[%s] found in table at index [%s]', message.dev_name, dev_pointer)
+        logger.debug('[%s] found in table at index [%s]', message.dev_name, dev_pointer)
 
         # Check for command change-of-state
         if devices[dev_pointer].dev_cmd != message.dev_cmd:
-            log.debug('New command detected [%s]', message.dev_cmd)
+            logger.debug('New command detected [%s]', message.dev_cmd)
             # Snapshot command so we only issue command message once
             devices[dev_pointer].dev_cmd = copy.copy(message.dev_cmd)
 
             # Issue messages to wemo servivce for wemo device commands
             if devices[dev_pointer].dev_type == 'wemo_switch':
                 # Build new message to forward to wemo service
-                log.debug('Generating message to wemo service')
+                logger.debug('Generating message to wemo service')
                 out_msg = SetDeviceStateMessage(
-                    log_path,
+                    logger=logger,
                     ref=ref_num.new(),
                     dest_addr=service_addresses['wemo_addr'],
                     dest_port=service_addresses['wemo_port'],
@@ -141,10 +141,10 @@ def process_get_device_scheduled_state_msg_ack(log_path, ref_num, devices, msg, 
                     dev_last_seen=devices[dev_pointer].dev_last_seen)
 
                 # Load message into output list
-                log.debug('Loading completed msg: [%s]', out_msg.complete)
+                logger.debug('Loading completed msg: [%s]', out_msg.complete)
                 out_msg_list.append(copy.copy(out_msg.complete))
     else:
-        log.debug('Device not in device list: %s', message.dev_name)
+        logger.debug('Device not in device list: %s', message.dev_name)
 
     # Return response message
     return out_msg_list
