@@ -31,6 +31,7 @@ def search_device_list(logger, devices, dev_name):
     """
     # Configure logger
     logger = logger or logging.getLogger(__name__)
+    
     logger.debug('Starting search of device table for matching name: %s', dev_name)
     for i, d in enumerate(devices):
         if dev_name.lower() == d.dev_name.lower():

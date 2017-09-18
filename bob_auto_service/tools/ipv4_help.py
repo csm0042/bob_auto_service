@@ -20,9 +20,11 @@ __status__ = "Development"
 
 
 # IPv4 Format helper function *************************************************
-def check_ipv4(address):
+def check_ipv4(address, logger=None):
     """ simple function used to determine if the contents of a string are
-    compatable with an ipv4 address """
+    compatable with an ipv4 address """    # Configure loggers
+    logger = logger or logging.getLogger(__name__)
+
     ipv4_regex = r'\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                  r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
                  r'(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \

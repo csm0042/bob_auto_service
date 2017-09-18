@@ -7,6 +7,7 @@
 import configparser
 import datetime
 import logging
+import logging.handlers
 import os
 import sys
 if __name__ == "__main__":
@@ -23,15 +24,6 @@ __version__ = "1.0.0"
 __maintainer__ = "Christopher Maue"
 __email__ = "csmaue@gmail.com"
 __status__ = "Development"
-
-
-class LogFilter(logging.Filter):
-
-    def filter(self, record):
-
-        record.ip = choice(ContextFilter.IPS)
-        record.user = choice(ContextFilter.USERS)
-        return True
 
 
 # Config Function Def *********************************************************
