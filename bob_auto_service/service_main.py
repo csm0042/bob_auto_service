@@ -241,7 +241,7 @@ class MainTask(object):
                         self.logger.debug('Queueing response message(s)')
                         for self.out_msg in self.out_msg_list:
                             self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
-                            self.logger.debug('Message [%s] successfully queued', self.out_msg)                            
+                            self.logger.debug('Message [%s] successfully queued', self.out_msg)
 
                 # Process messages from calendar/schedule service
                 if self.msg_source_addr == self.service_addresses['schedule_addr'] \
@@ -250,7 +250,7 @@ class MainTask(object):
                     # update last-seen timestamp from database service
                     if self.msg_type == self.message_types['heartbeat']:
                         self.logger.debug('Updating heartbeat timestamp '
-                                           'from schedule service')
+                                          'from schedule service')
                         self.timestamp_schedule = datetime.datetime.now()
 
                     # Process get device scheduled state message
@@ -384,7 +384,7 @@ class MainTask(object):
                     for self.out_msg in self.out_msg_list:
                         self.msg_out_queue.put_nowait(copy.copy(self.out_msg))
                         self.logger.debug('Message [%s] successfully queued',
-                                        self.out_msg)
+                                          self.out_msg)
 
 
 

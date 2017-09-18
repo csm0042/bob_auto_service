@@ -215,7 +215,7 @@ class GetDeviceStateMessage(object):
                               '%s', self._dev_addr)
         else:
             self.logger.warning('Device address update failed with input value: '
-                             '%s', value)
+                                '%s', value)
 
     # device status field *****************************************************
     @property

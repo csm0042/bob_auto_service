@@ -44,7 +44,7 @@ def process_get_device_state_msg(logger, msg, service_addresses):
     out_msg_list = []
 
     # Map message into CCS message class
-    message = GetDeviceStateMessage(logger)
+    message = GetDeviceStateMessage(logger=logger)
     message.complete = msg
 
     # Modify CCS message to forward to wemo service
@@ -74,7 +74,7 @@ def process_get_device_state_msg_ack(logger, devices, msg):
     out_msg_list = []
 
     # Map message into CCS message class
-    message = GetDeviceStateMessageACK(logger)
+    message = GetDeviceStateMessageACK(logger=logger)
     message.complete = msg
 
     # Search device table to find device name
@@ -115,7 +115,7 @@ def process_set_device_state_msg(logger, msg, service_addresses):
     out_msg_list = []
 
     # Map message into CCS message class
-    message = SetDeviceStateMessage(logger)
+    message = SetDeviceStateMessage(logger=logger)
     message.complete = msg
 
     message.dest_addr=service_addresses['wemo_addr']
@@ -144,7 +144,7 @@ def process_set_device_state_msg_ack(logger, devices, msg):
     out_msg_list = []
 
     # Map message into CCS message class
-    message = SetDeviceStateMessageACK(logger)
+    message = SetDeviceStateMessageACK(logger=logger)
     message.complete = msg
 
     # Search device table to find device name
