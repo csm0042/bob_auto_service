@@ -11,7 +11,6 @@ if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bob_auto_service.messages.heartbeat import HeartbeatMessage
 from bob_auto_service.messages.heartbeat_ack import HeartbeatMessageACK
-from bob_auto_service.tools.log_support import setup_function_logger
 
 
 # Authorship Info *************************************************************

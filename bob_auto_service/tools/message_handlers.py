@@ -7,9 +7,6 @@ import asyncio
 import logging
 import os
 import sys
-if __name__ == "__main__":
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from bob_auto_service.tools.log_support import setup_function_logger
 
 
 # Authorship Info *************************************************************
