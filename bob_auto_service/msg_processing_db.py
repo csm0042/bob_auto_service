@@ -130,7 +130,7 @@ def process_return_command_msg_ack(logger, ref_num, devices, msg, service_addres
 
     # Search device table to find device name
     logger.debug('Searching device table for [%s]', message.dev_name)
-    dev_pointer = search_device_list(log, devices, message.dev_name)
+    dev_pointer = search_device_list(devices, message.dev_name, logger=logger)
     logger.debug('Match found at device table index: %s', dev_pointer)
 
     # Send UC message to acknowledge received command and mark as processed

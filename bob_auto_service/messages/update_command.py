@@ -27,7 +27,7 @@ __status__ = "Development"
 # Message Class Definition ****************************************************
 class UpdateCommandMessage(object):
     """ Update Command message class and methods """
-    def __init__(self, logger, **kwargs):
+    def __init__(self, logger=None, **kwargs):
         # Configure loggers
         self.logger = logger or logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class UpdateCommandMessage(object):
 
     @ref.setter
     def ref(self, value):
-        if in_int_range(self.logger, value, 100, 999) is True:
+        if in_int_range(value, 100, 999, logger=self.logger) is True:
             self._ref = str(value)
             self.logger.debug('Ref number updated to: %s', self._ref)
         else:
@@ -102,14 +102,13 @@ class UpdateCommandMessage(object):
 
     @dest_addr.setter
     def dest_addr(self, value):
-        if check_ipv4(value) is True:
+        if check_ipv4(value, logger=self.logger) is True:
             self._dest_addr = str(value)
             self.logger.debug('Destination address updated to: '
-                            '%s', self._dest_addr)
+                              '%s', self._dest_addr)
         else:
             self.logger.warning('Destination address update failed with input value: '
                                 '%s', value)
-        
 
     # destination port ********************************************************
     @property
@@ -120,7 +119,7 @@ class UpdateCommandMessage(object):
 
     @dest_port.setter
     def dest_port(self, value):
-        if in_int_range(self.logger, value, 10000, 60000) is True:
+        if in_int_range(value, 10000, 60000, logger=self.logger) is True:
             self._dest_port = str(value)
             self.logger.debug('Destination port updated to: %s', self._dest_port)
         else:
@@ -136,7 +135,7 @@ class UpdateCommandMessage(object):
 
     @source_addr.setter
     def source_addr(self, value):
-        if check_ipv4(value) is True:
+        if check_ipv4(value, logger=self.logger) is True:
             self._source_addr = value
             self.logger.debug('source address updated to: '
                               '%s', self._source_addr)
@@ -153,7 +152,7 @@ class UpdateCommandMessage(object):
 
     @source_port.setter
     def source_port(self, value):
-        if in_int_range(self.logger, value, 10000, 60000) is True:
+        if in_int_range(value, 10000, 60000, logger=self.logger) is True:
             self._source_port = str(value)
             self.logger.debug('Source port updated to: %s', self._source_port)
         else:
@@ -169,7 +168,7 @@ class UpdateCommandMessage(object):
 
     @msg_type.setter
     def msg_type(self, value):
-        if in_int_range(self.logger, value, 100, 999) is True:
+        if in_int_range(value, 100, 999, logger=self.logger) is True:
             self._msg_type = str(value)
             self.logger.debug('Message type updated to: %s', self._msg_type)
         else:
@@ -202,9 +201,9 @@ class UpdateCommandMessage(object):
     @dev_processed.setter
     def dev_processed(self, value):
         self._dev_processed = is_valid_datetime(
-            self.logger,
             value,
-            self._dev_processed)
+            self._dev_processed,
+            logger=self.logger)
         self.logger.debug('Device processed updated to: %s', self._dev_processed)
 
     # complete message encode/decode methods **********************************

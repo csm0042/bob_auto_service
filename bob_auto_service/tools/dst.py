@@ -20,7 +20,7 @@ __status__ = "Development"
 
 # Daylight Savings Time Class *************************************************
 class USdst(object):
-    def __init__(self, logger):
+    def __init__(self, logger=None):
         # Configure logger
         self.logger = logger or logging.getLogger(__name__)
         # Init tags        
@@ -135,7 +135,7 @@ class USdst(object):
         Defaults to current date/time if no input value given """
         # Update value stored in dt_now to current datetime
         self.dt = datetime.datetime.now()
-        # Process input variables if present    
+        # Process input variables if present
         if kwargs is not None:
             for key, value in kwargs.items():
                 if key == "datetime":
@@ -149,9 +149,9 @@ class USdst(object):
         self.novFirstSun = 7 - self.novStartsOn.weekday()
         # Set bounds for dst active
         self.dstStarts = datetime.datetime.combine(
-            (datetime.date(self.dt.year, 3, self.marchSecondSun)),(datetime.time(2,0)))
+            (datetime.date(self.dt.year, 3, self.marchSecondSun)),(datetime.time(2, 0)))
         self.dstEnds = datetime.datetime.combine(
-            (datetime.date(self.dt.year, 11, self.novFirstSun)),(datetime.time(2,0)))
+            (datetime.date(self.dt.year, 11, self.novFirstSun)),(datetime.time(2, 0)))
         # Determine if date fed into routine falls within bounds
         if self.dstStarts <= self.dt <= self.dstEnds:
             return True

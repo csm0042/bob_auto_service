@@ -24,14 +24,14 @@ __status__ = "Development"
 
 
 # Search device list by name **************************************************
-def search_device_list(logger, devices, dev_name):
+def search_device_list(devices, dev_name, logger=None):
     """ function to search a list of items of Device class items and return
         the index of the item in the list that has a match in the dev_name
         element
     """
     # Configure logger
     logger = logger or logging.getLogger(__name__)
-    
+
     logger.debug('Starting search of device table for matching name: %s', dev_name)
     for i, d in enumerate(devices):
         if dev_name.lower() == d.dev_name.lower():
@@ -45,7 +45,7 @@ def search_device_list(logger, devices, dev_name):
 class Device(object):
     """ Class used to define the objects and methods associated with a physical
     device that will be interfaced to/from this application """
-    def __init__(self, logger, **kwargs):
+    def __init__(self, logger=None, **kwargs):
         # Configure logger
         self.logger = logger or logging.getLogger(__name__)
 
@@ -138,13 +138,13 @@ class Device(object):
     @dev_addr.setter
     def dev_addr(self, value):
         if isinstance(value, str):
-            if check_ipv4(value) is True:
+            if check_ipv4(value, logger=self.logger) is True:
                 self._dev_addr = value
                 self.logger.debug('Device address updated to: %s', self._dev_addr)
             else:
                 self.logger.warning('Invalid address: %s', value)
         else:
-            if check_ipv4(str(value)) is True:
+            if check_ipv4(str(value), logger=self.logger) is True:
                 self._dev_addr = str(value)
                 self.logger.debug('Device address updated to: %s', self._dev_addr)
             else:

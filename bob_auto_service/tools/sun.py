@@ -22,7 +22,7 @@ __status__ = "Development"
 
 # Sun Class *******************************************************************
 class Sun(object):
-    def __init__(self, latitude, longitude, offset_hours, logger):
+    def __init__(self, latitude, longitude, offset_hours, logger=None):
         # Configure logger
         self.logger = logger or logging.getLogger(__name__)
         
@@ -74,7 +74,7 @@ class Sun(object):
         self.calc()
         self._last_calc = datetime.datetime.now()
         self.logger.debug('Init complete for Sun class for coordinates '
-                           '%s by %s', self._latitude, self._longitude)
+                          '%s by %s', self._latitude, self._longitude)
 
 
     def calc(self, when=None):

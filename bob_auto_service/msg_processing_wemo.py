@@ -79,7 +79,7 @@ def process_get_device_state_msg_ack(logger, devices, msg):
 
     # Search device table to find device name
     logger.debug('Searching device table for [%s]', message.dev_name)
-    dev_pointer = search_device_list(logger, devices, message.dev_name)
+    dev_pointer = search_device_list(devices, message.dev_name, logger=logger)
     logger.debug('Match found at device table index: %s', dev_pointer)    
 
     # Update values based on message content
@@ -149,7 +149,7 @@ def process_set_device_state_msg_ack(logger, devices, msg):
 
     # Search device table to find device name
     logger.debug('Searching device table for [%s]', message.dev_name)
-    dev_pointer = search_device_list(logger, devices, message.dev_name)
+    dev_pointer = search_device_list(devices, message.dev_name, logger=logger)
     logger.debug('Match found at device table index: %s', dev_pointer)
 
     # Update values based on message content

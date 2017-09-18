@@ -38,9 +38,9 @@ MESSAGE_TYPES = SERVICE_CONFIG.get_message_types()
 CUR_LAT, CUR_LONG = SERVICE_CONFIG.get_location()
 DEVICES = SERVICE_CONFIG.get_devices()
 
-REF_NUM = RefNum(LOGGER)
+REF_NUM = RefNum(logger=LOGGER)
 LOOP = asyncio.get_event_loop()
-COMM_HANDLER = MessageHandler(LOGGER, LOOP)
+COMM_HANDLER = MessageHandler(LOOP, logger=LOGGER)
 MAINTASK = MainTask(
     logger=LOGGER,
     ref=REF_NUM,

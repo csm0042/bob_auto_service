@@ -44,17 +44,15 @@ class ConfigureService(object):
         self.log_path = str()
         # Define connection to configuration file
         self.config_file = configparser.ConfigParser()
-        # Configure logger
-        self.log = self.get_logger()
 
 
     def get_logger(self):
         # Set up application logging
         self.config_file.read(self.filename)
         self.log_path = self.config_file['LOG FILES']['log_file_path']
-        self.log = logging.getLogger('master')
-        self.log.setLevel(logging.DEBUG)
-        self.log.handlers = []
+        self.logger = logging.getLogger('master')
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.handlers = []
         os.makedirs(self.log_path, exist_ok=True)
         # Console handler
         self.handlers = []
@@ -62,8 +60,8 @@ class ConfigureService(object):
         self.ch.setLevel(logging.INFO)
         self.cf = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         self.ch.setFormatter(self.cf)
-        self.log.addHandler(self.ch)
-        self.log.info('Console logger handler created and applied')
+        self.logger.addHandler(self.ch)
+        self.logger.info('Console logger handler created and applied')
         # File handler
         self.fh = logging.handlers.TimedRotatingFileHandler(
             os.path.join(self.log_path, "Debug.log"),
@@ -77,9 +75,10 @@ class ConfigureService(object):
             '%(funcName)-22s %(message)s'
         )
         self.fh.setFormatter(self.ff)
-        self.log.addHandler(self.fh)
+        self.logger.addHandler(self.fh)
+        self.logger.info('File logger handler created and applied')
         # Return configured objects to main program
-        return self.log
+        return self.logger
 
 
     def get_servers(self):
@@ -112,16 +111,16 @@ class ConfigureService(object):
         self.config_file.read(self.filename)
         # Create list of automation devices defined in config.ini file
         self.devices = []
-        self.log.debug('Begining search for device configuration in config file')
+        self.logger.debug('Begining search for device configuration in config file')
         self.device_num = int(self.config_file['DEVICES']['device_num']) + 1
-        self.log.debug('Importing configuration for %s devices', str(self.device_num))
+        self.logger.debug('Importing configuration for %s devices', str(self.device_num))
         for self.i in range(1, self.device_num, 1):
             try:
                 if len(str(self.i)) == 1:
-                    self.log.debug('Single digit device ID number')
+                    self.logger.debug('Single digit device ID number')
                     self.device_id = 'device0' + str(self.i)
                 elif len(str(self.i)) == 2:
-                    self.log.debug('Double digit device ID number')
+                    self.logger.debug('Double digit device ID number')
                     self.device_id = 'device' + str(self.i)
                 self.devices.append(
                     Device(
@@ -130,13 +129,13 @@ class ConfigureService(object):
                         dev_addr=self.config_file['DEVICES'][self.device_id + '_address'],
                         dev_last_seen=datetime.datetime.now(),
                         dev_rule=self.config_file['DEVICES'][self.device_id + '_rule']))
-                self.log.debug('Device %s added to automation device list',
+                self.logger.debug('Device %s added to automation device list',
                                self.config_file['DEVICES'][self.device_id + '_name'])
             except Exception:
                 pass
-        self.log.debug('Completed automation device list:')
+        self.logger.debug('Completed automation device list:')
         for self.device in self.devices:
-            self.log.debug(
+            self.logger.debug(
                 '%s, %s, %s, %s, %s, %s, %s',
                 self.device.dev_name, self.device.dev_type,
                 self.device.dev_addr, self.device.dev_cmd,

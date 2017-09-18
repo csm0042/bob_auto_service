@@ -24,7 +24,7 @@ __status__ = "Development"
 
 # Class definition ************************************************************
 class RefNum(object):
-    def __init__(self, logger):
+    def __init__(self, logger=None):
         # Configure logger
         self.logger = logger or logging.getLogger(__name__)
 

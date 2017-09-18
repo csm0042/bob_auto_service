@@ -32,7 +32,7 @@ DATETIME_REGEX = r'\b([0-9][0-9][0-9][0-9])-((0[0-9])|(1[0-2]))-(([0-2][0-9])|(3
 
 
 # In Integer range checker ****************************************************
-def in_int_range(logger, value, low_limit, high_limit):
+def in_int_range(value, low_limit, high_limit, logger=None):
     # Configure loggers
     logger = logger or logging.getLogger(__name__)
 
@@ -54,16 +54,16 @@ def in_int_range(logger, value, low_limit, high_limit):
 
 
 # Valid datetime checker ******************************************************
-def is_valid_datetime(logger, value, initial_value):
+def is_valid_datetime(value, initial_value, logger=None):
     # When a valid datetime is provided, return its string equivalent,
     # truncated to the seconds field
     # Configure loggers
     logger = logger or logging.getLogger(__name__)
-        
+
     if isinstance(value, datetime.datetime):
         logger.debug('Input value matches datetime format: %s', value)
         result = (str(value))[:19]
-    
+
     # If only the date portion is provided, merge it with the current time
     elif isinstance(value, datetime.date):
         logger.debug('Input value matches date format: %s', value)
@@ -73,7 +73,7 @@ def is_valid_datetime(logger, value, initial_value):
                 datetime.datetime.now().time()
             )
         ))[:19]
-    
+
     # If only the time portion is provided, merge it with the current date
     elif isinstance(value, datetime.time):
         logger.debug('Input value matches time format: %s', value)
@@ -83,7 +83,7 @@ def is_valid_datetime(logger, value, initial_value):
                 value
             )
         ))[:19]
-    
+
     # If the input value is provided in string format,
     # determine what data it contains
     elif isinstance(value, str):
