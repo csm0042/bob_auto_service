@@ -144,7 +144,6 @@ class ConfigureService(object):
                     func_name=self.func_name
                 )
             )
-            print(self.file_name + "    " + self.func_name)
             self.handlers[self.i].addFilter(self.filters[self.i])
             # Create formatter and apply to handler
             self.formatters.append(logging.Formatter('%(asctime)-25s %(levelname)-10s %(message)s'))
