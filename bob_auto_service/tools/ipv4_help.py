@@ -21,7 +21,8 @@ __status__ = "Development"
 # IPv4 Format helper function *************************************************
 def check_ipv4(address, logger=None):
     """ simple function used to determine if the contents of a string are
-    compatable with an ipv4 address """    # Configure loggers
+    compatable with an ipv4 address """
+    # Configure loggers
     logger = logger or logging.getLogger(__name__)
 
     ipv4_regex = r'\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.' \
@@ -32,10 +33,15 @@ def check_ipv4(address, logger=None):
     if isinstance(address, str) is not True:
         try:
             address = str(address)
+            logger.debug('Input value was successfully converted to string')
         except Exception:
             return False
+    else:
+        logger.debug('Input value was not a string: %s', str(address))
     # check if address is formatted correctly for an ipv4 address
     if re.fullmatch(ipv4_regex, address) is not None:
+        logger.debug('Provided address is a valid IP address: %s', address)
         return True
     else:
+        logger.debug('Provided address is NOT a valid IP address: %s', address)
         return False
